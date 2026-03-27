@@ -4,9 +4,7 @@ import model.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * PanelTorneo — muestra el cuadro de la ronda actual,
@@ -30,6 +28,7 @@ public class PanelTorneo extends JPanel {
 
     private JPanel panelCruces;
     private JTextArea txtGoleadores;
+    private JLabel    lblAnuncio; // Para mensajes grandes (ELIMINADO / CAMPEÓN)
 
     // ─────────────────────────────────────────────────────────────────────
     public PanelTorneo(MainFrame frame) {
@@ -57,6 +56,15 @@ public class PanelTorneo extends JPanel {
 
         header.add(lblRonda,  BorderLayout.WEST);
         header.add(lblEquipo, BorderLayout.EAST);
+        
+        lblAnuncio = new JLabel("", SwingConstants.CENTER);
+        lblAnuncio.setFont(new Font("SansSerif", Font.BOLD, 18));
+        lblAnuncio.setOpaque(true);
+        lblAnuncio.setBackground(BG_DARK);
+        lblAnuncio.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        lblAnuncio.setVisible(false);
+        
+        header.add(lblAnuncio, BorderLayout.SOUTH);
 
         // ── Botones de acción ─────────────────────────────────────────────
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
@@ -64,14 +72,32 @@ public class PanelTorneo extends JPanel {
 
         JButton btnJugar   = boton("▶  Jugar mi partido", UCL_BLUE,  BLANCO);
         JButton btnSimular = boton("⚡ Simular ronda completa (IA)", new Color(40, 80, 40), VERDE);
+        JButton btnAlineacion = boton("📋  Mi Alineación", new Color(0, 50, 80), UCL_BLUE);
         JButton btnMercado = boton("💶  Mercado de fichajes", new Color(60, 40, 10), UCL_GOLD);
 
         btnJugar.addActionListener(e -> jugarPartidoUsuario());
         btnSimular.addActionListener(e -> simularRondaIA());
+        btnAlineacion.addActionListener(e -> {
+            // Buscar si hay una eliminatoria pendiente para el usuario
+            Equipo usr = frame.getTorneo().getEquipoUsuario();
+            for (Eliminatoria elim : frame.getTorneo().getEliminatorias()) {
+                if ((elim.getEquipoA() == usr || elim.getEquipoB() == usr) && !elim.isCompleta()) {
+                    frame.setEliminatoriaActual(elim);
+                    break;
+                }
+            }
+            frame.mostrarPantalla(MainFrame.PANTALLA_ALINEACION);
+        });
         btnMercado.addActionListener(e -> frame.mostrarPantalla(MainFrame.PANTALLA_MERCADO));
+
+        boolean terminado = t.isTerminado();
+        btnJugar.setEnabled(!terminado);
+        btnSimular.setEnabled(!terminado);
+        btnMercado.setEnabled(!terminado);
 
         panelBotones.add(btnJugar);
         panelBotones.add(btnSimular);
+        panelBotones.add(btnAlineacion);
         panelBotones.add(btnMercado);
 
         // ── Cruces ────────────────────────────────────────────────────────
@@ -96,6 +122,7 @@ public class PanelTorneo extends JPanel {
         txtGoleadores.setEditable(false);
         txtGoleadores.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
         actualizarGoleadores();
+        verificarEstado();
 
         JScrollPane scrollGol = new JScrollPane(txtGoleadores);
         scrollGol.setPreferredSize(new Dimension(300, 200));
@@ -186,24 +213,67 @@ public class PanelTorneo extends JPanel {
         return panel;
     }
 
+    private void verificarEstado() {
+        Torneo t = frame.getTorneo();
+        Equipo usr = t.getEquipoUsuario();
+        
+        // 1. Ganador del Torneo
+        if (t.isTerminado()) {
+            Equipo ganador = t.getGanadorTorneo();
+            lblAnuncio.setVisible(true);
+            if (ganador == usr) {
+                lblAnuncio.setText("🏆 ¡CAMPEONES DE EUROPA! 🏆");
+                lblAnuncio.setForeground(UCL_GOLD);
+            } else {
+                lblAnuncio.setText("🏆 GANADOR: " + (ganador != null ? ganador.getNombre() : "S/N") + " 🏆");
+                lblAnuncio.setForeground(BLANCO);
+            }
+            return;
+        }
+
+        // 2. Eliminación del usuario
+        // Buscamos si el usuario está en las eliminatorias de la ronda actual
+        boolean sigueVivo = false;
+        for (Eliminatoria elim : t.getEliminatorias()) {
+            if (elim.getEquipoA() == usr || elim.getEquipoB() == usr) {
+                sigueVivo = true;
+                break;
+            }
+        }
+        
+        if (!sigueVivo && t.getRondaActual() > 0) {
+            lblAnuncio.setVisible(true);
+            lblAnuncio.setText("❌ HAS SIDO ELIMINADO DEL TORNEO ❌");
+            lblAnuncio.setForeground(ROJO);
+        } else {
+            lblAnuncio.setVisible(false);
+        }
+    }
+
     // ── Goleadores ────────────────────────────────────────────────────────
 
     private void actualizarGoleadores() {
         frame.getTorneo().refrescarGoleadores();
-        // USO DE Iterator (a través de getTopGoleadores que usa Iterator sobre TreeSet)
         ArrayList<Jugador> top = frame.getTorneo().getTopGoleadores(10);
+        
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(" %-3s %-22s %-5s %-5s\n", "#", "Jugador", "Club", "Goles"));
-        sb.append(" " + "─".repeat(42) + "\n");
-
-        Iterator<Jugador> it = top.iterator(); // ← Iterator sobre ArrayList de goleadores
+        sb.append(" ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n");
+        sb.append(" ┃   🏆 TOP 10 MÁXIMOS GOLEADORES 🏆    ┃\n");
+        sb.append(" ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n");
+        sb.append(String.format("  %-3s %-20s %-10s %-5s\n", "Pos", "Jugador", "Club", "Goles"));
+        sb.append("  " + "─".repeat(40) + "\n");
+        
         int pos = 1;
-        while (it.hasNext()) {
-            Jugador j = it.next();
-            String club = j.getEquipo() != null ? j.getEquipo().getNombre().substring(0, Math.min(10, j.getEquipo().getNombre().length())) : "?";
-            sb.append(String.format(" %-3d %-22s %-10s ⚽%d\n", pos++, j.getNombre(), club, j.getGoles()));
+        for (Jugador j : top) {
+            String club = j.getEquipo() != null 
+                ? j.getEquipo().getNombre().substring(0, Math.min(10, j.getEquipo().getNombre().length())) 
+                : "?";
+            String estrella = (pos <= 3) ? "⭐ " : "  ";
+            sb.append(String.format(" %s%-2d %-20s %-10s  %d\n", estrella, pos++, 
+                j.getNombre(), club, j.getGoles()));
         }
-        if (top.isEmpty()) sb.append(" Sin goles aún — ¡juega el primer partido!\n");
+        
+        if (top.isEmpty()) sb.append("\n    ¡Aún no hay goles en el torneo!\n");
         txtGoleadores.setText(sb.toString());
     }
 
@@ -247,6 +317,10 @@ public class PanelTorneo extends JPanel {
     private void jugarPartidoUsuario() {
         Equipo usr = frame.getTorneo().getEquipoUsuario();
         Eliminatoria elim = null;
+        if (frame.getTorneo().isTerminado()) {
+            JOptionPane.showMessageDialog(this, "El torneo ha finalizado.");
+            return;
+        }
         for (Eliminatoria e : frame.getTorneo().getEliminatorias()) {
             if (e.getEquipoA() == usr || e.getEquipoB() == usr) {
                 elim = e; break;
@@ -261,10 +335,14 @@ public class PanelTorneo extends JPanel {
             return;
         }
         frame.setEliminatoriaActual(elim);
-        frame.mostrarPantalla(MainFrame.PANTALLA_PARTIDO);
+        frame.mostrarPantalla(MainFrame.PANTALLA_ALINEACION);
     }
 
     private void simularRondaIA() {
+        if (frame.getTorneo().isTerminado()) {
+            JOptionPane.showMessageDialog(this, "El torneo ha finalizado.");
+            return;
+        }
         // Verificar si el partido del usuario ya fue jugado
         Equipo usr = frame.getTorneo().getEquipoUsuario();
         for (Eliminatoria e : frame.getTorneo().getEliminatorias()) {
@@ -284,6 +362,7 @@ public class PanelTorneo extends JPanel {
         frame.simularRondaIA();
         actualizarCruces();
         actualizarGoleadores();
+        verificarEstado();
     }
     private JButton boton(String texto, Color bg, Color fg) {
         JButton btn = new JButton(texto);

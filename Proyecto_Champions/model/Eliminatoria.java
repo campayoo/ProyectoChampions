@@ -1,5 +1,6 @@
 package model;
 
+
 /**
  * Eliminatoria — gestiona la ida y vuelta (o la final a partido único)
  * entre dos equipos. Calcula el clasificado considerando el global y,
@@ -38,19 +39,17 @@ public class Eliminatoria {
         determinarGanador();
     }
 
-    /** Determina el ganador de la eliminatoria. */
+    /** Determina el ganador de la eliminatoria si no hay empate. */
     public void determinarGanador() {
         if (!doblePartido) {
             // Final: partido único
-            if (ida.getGanador() != null) {
-                ganador = ida.getGanador();
-            } else {
-                // Empate en la final → penaltis
-                String texto = ida.simularPenaltis();
+            if (ida != null && ida.isTerminado()) {
                 ganador = ida.getGanador();
             }
             return;
         }
+
+        if (ida == null || !ida.isTerminado() || vuelta == null || !vuelta.isTerminado()) return;
 
         // Doble partido: suma de goles
         int golesA = ida.getGolesLocal()     + vuelta.getGolesVisitante();
@@ -61,10 +60,34 @@ public class Eliminatoria {
         } else if (golesB > golesA) {
             ganador = equipoB;
         } else {
-            // Empate global → penaltis en el partido de vuelta
-            vuelta.simularPenaltis();
-            ganador = vuelta.getGanador();
+            // Empate global -> No hay ganador deportivo.
+            // Para que el torneo no se rompa, si no es el usuario, resolvemos por suerte o fuerza.
+            ganador = null; 
         }
+    }
+
+    /** Resolución forzada para simulaciones de la IA. */
+    public void resolverEmpateIA() {
+        if (ganador != null) return;
+        // El que tenga más poder total gana el desempate "en los despachos"
+        if (equipoA.getPoderofensivo() + equipoA.getPoderDefensivo() > 
+            equipoB.getPoderofensivo() + equipoB.getPoderDefensivo()) {
+            ganador = equipoA;
+        } else {
+            ganador = equipoB;
+        }
+    }
+
+    /** Verifica si la eliminatoria ha terminado en empate global y requiere penaltis. */
+    public boolean requierePenaltis() {
+        if (!doblePartido) {
+            return ida != null && ida.isTerminado() && ida.getGolesLocal() == ida.getGolesVisitante() && !ida.isNecesitaPenaltis();
+        }
+        if (ida == null || !ida.isTerminado() || vuelta == null || !vuelta.isTerminado()) return false;
+        
+        int golesA = ida.getGolesLocal()     + vuelta.getGolesVisitante();
+        int golesB = ida.getGolesVisitante() + vuelta.getGolesLocal();
+        return golesA == golesB && !vuelta.isNecesitaPenaltis();
     }
 
     // ── Creación de partidos para el jugador humano ───────────────────────

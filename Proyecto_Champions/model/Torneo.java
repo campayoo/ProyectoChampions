@@ -134,6 +134,12 @@ public class Torneo {
 
     // ── Info de ronda ─────────────────────────────────────────────────────
 
+    public Equipo getGanadorTorneo() {
+        if (!isTerminado() || eliminatorias.isEmpty()) return null;
+        // La última eliminatoria de la lista es la final
+        return eliminatorias.get(eliminatorias.size() - 1).getGanador();
+    }
+
     public String getNombreRonda() {
         return rondaActual < NOMBRES_RONDA.length ? NOMBRES_RONDA[rondaActual] : "Torneo Finalizado";
     }

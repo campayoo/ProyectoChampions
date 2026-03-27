@@ -18,6 +18,7 @@ public class MainFrame extends JFrame {
     public static final String PANTALLA_TORNEO     = "TORNEO";
     public static final String PANTALLA_PARTIDO    = "PARTIDO";
     public static final String PANTALLA_MERCADO    = "MERCADO";
+    public static final String PANTALLA_ALINEACION = "ALINEACION";
 
     // ── Modelo ────────────────────────────────────────────────────────────
     private Torneo          torneo;
@@ -100,6 +101,11 @@ public class MainFrame extends JFrame {
                 contenedor.add(panelMercado, PANTALLA_MERCADO);
                 cardLayout.show(contenedor, PANTALLA_MERCADO);
             }
+            case PANTALLA_ALINEACION -> {
+                PanelAlineacion pa = new PanelAlineacion(this, torneo.getEquipoUsuario());
+                contenedor.add(pa, PANTALLA_ALINEACION);
+                cardLayout.show(contenedor, PANTALLA_ALINEACION);
+            }
         }
     }
 
@@ -146,6 +152,8 @@ public class MainFrame extends JFrame {
                 elim.jugarIdaAuto();
                 if (elim.isDoblePartido()) elim.jugarVueltaAuto();
                 else                       elim.determinarGanador();
+                
+                if (elim.getGanador() == null) elim.resolverEmpateIA();
                 if (elim.getGanador() != null) clasificados.add(elim.getGanador());
             }
         }
@@ -160,9 +168,9 @@ public class MainFrame extends JFrame {
 
         torneo.refrescarGoleadores();
 
-        // Publicar jugadores eliminados en el mercado
         for (Equipo e : torneo.getEquipos()) {
             if (!clasificados.contains(e)) mercado.publicarPlantillaEliminada(e);
+            e.recuperarEnergiaPlantilla(); // Todos recuperan energía tras los partidos
         }
 
         torneo.avanzarRonda(clasificados);
