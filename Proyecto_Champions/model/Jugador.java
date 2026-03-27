@@ -63,7 +63,9 @@ public class Jugador extends Persona implements Transferible, Comparable<Jugador
     public int compareTo(Jugador otro) {
         int cmp = Integer.compare(otro.goles, this.goles); // desc
         if (cmp != 0) return cmp;
-        return this.nombre.compareTo(otro.nombre);         // tiebreak alfabético
+        cmp = this.nombre.compareTo(otro.nombre);         // tiebreak alfabético
+        if (cmp != 0) return cmp;
+        return Integer.compare(this.id, otro.id);          // tiebreak por ID (único)
     }
 
     // ── Lógica deportiva ─────────────────────────────────────────────────
@@ -75,9 +77,9 @@ public class Jugador extends Persona implements Transferible, Comparable<Jugador
     public int getMediaGeneral() {
         return switch (posicion) {
             case "POR" -> (int) (defensa * 0.70 + ataque * 0.10 + energiaMax * 0.20);
-            case "DEF" -> (int) (defensa * 0.60 + ataque * 0.20 + energiaMax * 0.20);
-            case "MED" -> (int) (ataque  * 0.40 + defensa * 0.40 + energiaMax * 0.20);
-            case "DEL" -> (int) (ataque  * 0.65 + defensa * 0.10 + energiaMax * 0.25);
+            case "DEF", "LD", "LI", "DFC", "CAD", "CAI" -> (int) (defensa * 0.60 + ataque * 0.20 + energiaMax * 0.20);
+            case "MED", "MC", "MCD", "MCO", "MI", "MD" -> (int) (ataque  * 0.45 + defensa * 0.35 + energiaMax * 0.20);
+            case "DEL", "DC", "ED", "EI", "SD" -> (int) (ataque  * 0.65 + defensa * 0.10 + energiaMax * 0.25);
             default    -> (ataque + defensa + energiaMax) / 3;
         };
     }
