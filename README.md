@@ -1,4 +1,4 @@
-# ⚽ Proyecto Champions  
+# ⚽ Proyecto Champions
 ### 🏆 Simulador avanzado de torneos de fútbol en Java
 
 ![Java](https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=java&logoColor=white)
@@ -10,90 +10,111 @@
 ---
 
 ## 📌 1. Descripción
+
 **Proyecto Champions** es una aplicación Java que simula un entorno completo de fútbol profesional. Permite gestionar equipos, jugadores, realizar fichajes y organizar torneos eliminatorios, todo bajo una arquitectura sólida y una interfaz gráfica funcional.
 
 ---
 
-## 🎥 2. Demo visual (GIFs)
-* **🏠 Pantalla principal**: ![Demo Principal](docs/gifs/main.gif)
-* **💰 Mercado de fichajes**: ![Mercado](docs/gifs/mercado.gif)
-* **⚽ Simulación de partido**: ![Partido](docs/gifs/partido.gif)
-* **🏆 Torneo**: ![Torneo](docs/gifs/torneo.gif)
+## 🎥 2. Demo visual
+
+| Pantalla | Vista previa |
+|----------|--------------|
+| 🏠 Pantalla principal | ![Demo Principal](docs/gifs/main.gif) |
+| 💰 Mercado de fichajes | ![Mercado](docs/gifs/mercado.gif) |
+| ⚽ Simulación de partido | ![Partido](docs/gifs/partido.gif) |
+| 🏆 Torneo | ![Torneo](docs/gifs/torneo.gif) |
 
 ---
 
 ## 📸 3. Capturas de pantalla
-* **Interfaz general**: ![UI](docs/images/ui.png)
-* **Alineaciones**: ![Alineacion](docs/images/alineacion.png)
-* **Panel de equipos**: ![Equipos](docs/images/equipos.png)
+
+| Interfaz general | Alineaciones | Panel de equipos |
+|------------------|--------------|------------------|
+| ![UI](docs/images/ui.png) | ![Alineacion](docs/images/alineacion.png) | ![Equipos](docs/images/equipos.png) |
 
 ---
 
 ## 🧠 4. Conceptos aplicados
-* **Programación Orientada a Objetos (POO)**: Encapsulación, herencia y polimorfismo.
-* **Interfaces**: Implementación de contratos con `Simulable` y `Transferible`.
-* **Arquitectura por capas**: Separación de responsabilidades (Modelo-Vista).
-* **Persistencia**: Lectura de datos desde archivos **CSV**.
-* **GUI**: Desarrollo de interfaces con **Swing**.
+
+| Concepto | Descripción |
+|----------|-------------|
+| **POO** | Encapsulación, herencia y polimorfismo |
+| **Interfaces** | Contratos con `Simulable` y `Transferible` |
+| **Arquitectura por capas** | Separación de responsabilidades (Modelo-Vista) |
+| **Persistencia** | Lectura de datos desde archivos **CSV** |
+| **GUI** | Desarrollo de interfaces con **Swing** |
 
 ---
 
 ## 🏗️ 5. Arquitectura
+
 ### 📊 Diagrama UML
+
 ![UML](docs/uml/diagrama.png)
 
 ### 🧩 Estructura del proyecto
-```bash
+
+```
 Proyecto_Champions/
 │
-├── data/               # Datos externos (CSVs)
+├── data/                    # Datos externos (CSVs)
 │   ├── equipos.csv
 │   └── LectorDatos.java
 │
-├── gui/                # Capa de presentación (Swing)
+├── gui/                     # Capa de presentación (Swing)
 │   ├── MainFrame.java
-│   ├── Panel...        # Paneles específicos (Bienvenida, Mercado, etc.)
+│   ├── Panel...             # Paneles específicos (Bienvenida, Mercado, etc.)
 │   └── PanelCampo.java
 │
-├── interfaces/         # Contratos y abstracciones
+├── interfaces/              # Contratos y abstracciones
 │   ├── Simulable.java
 │   └── Transferible.java
 │
-├── model/              # Lógica de negocio y entidades
-│   ├── Persona.java    # Clase padre
+├── model/                   # Lógica de negocio y entidades
+│   ├── Persona.java         # Clase padre
 │   ├── Jugador.java
 │   ├── Equipo.java
 │   ├── Partido.java
 │   └── MercadoFichajes.java
 │
-└── Main.java           # Punto de entrada
+└── Main.java                # Punto de entrada
 ```
----
-## ⚙️ 6. Funcionalidades
-🧍 Jugadores: Creación de perfiles con atributos personalizados y sistema de transferencias.
-🏟️ Equipos: Plantillas completas, gestión de presupuesto y entrenadores asociados.
-💰 Mercado: Sistema dinámico de compra/venta con validación automática de presupuesto.
-⚽ Partidos: Simulación automática con resultados dinámicos basados en estadísticas de los equipos.
-🏆 Torneos: Sistema de eliminatorias con rondas automáticas hasta alcanzar el campeón final.
 
 ---
-🔌 7. Interfaces clave
-Simulable
-Java
-
+
+## ⚙️ 6. Funcionalidades
+
+- 🧍 **Jugadores** — Creación de perfiles con atributos personalizados y sistema de transferencias.
+- 🏟️ **Equipos** — Plantillas completas, gestión de presupuesto y entrenadores asociados.
+- 💰 **Mercado** — Sistema dinámico de compra/venta con validación automática de presupuesto.
+- ⚽ **Partidos** — Simulación automática con resultados dinámicos basados en estadísticas de los equipos.
+- 🏆 **Torneos** — Sistema de eliminatorias con rondas automáticas hasta alcanzar el campeón final.
+
+---
+
+## 🔌 7. Interfaces clave
+
+### `Simulable`
+
+```java
 public interface Simulable {
     void simular();
 }
-Transferible
-Java
-
+```
+
+### `Transferible`
+
+```java
 public interface Transferible {
     void transferir(Equipo destino);
 }
+```
+
 ---
-🔄 8. Flujo del sistema
-Text
-
+
+## 🔄 8. Flujo del sistema
+
+```
 Inicio
   ↓
 Carga de datos (CSV)
@@ -107,64 +128,96 @@ Simulación de partidos
 Torneo
   ↓
 Resultado final
-🚀 9. Instalación y ejecución
-1. Clonar repositorio
-Bash
-
+```
+
+---
+
+## 🚀 9. Instalación y ejecución
+
+### 1. Clonar el repositorio
+
+```bash
 git clone https://github.com/tu-usuario/proyecto-champions.git
-2. Requisitos
-Java 17+
-IntelliJ / Eclipse
-3. Ejecutar
-Bash
-
+```
+
+### 2. Requisitos
+
+- Java 17+
+- IntelliJ IDEA / Eclipse
+
+### 3. Ejecutar
+
+```bash
 java Main.java
-🧪 10. Tests y cobertura
-Tecnologías
-JUnit 5
-Mockito (opcional)
-Ejemplo de test
-Java
-
+```
+
+---
+
+## 🧪 10. Tests y cobertura
+
+### Tecnologías utilizadas
+
+- **JUnit 5**
+- **Mockito** *(opcional)*
+
+### Ejemplo de test
+
+```java
 @Test
 void testSimulacionPartido() {
     Partido partido = new Partido(equipo1, equipo2);
     partido.simular();
     assertNotNull(partido.getResultado());
 }
-Cobertura
-💡 Puedes generarlo con IntelliJ o JaCoCo.
+```
 
-📊 11. Datos iniciales
-El archivo data/equipos.csv permite inicializar equipos automáticamente.
+> 💡 La cobertura puede generarse con **IntelliJ** o **JaCoCo**.
 
-💡 12. Mejoras futuras
- Base de datos (MySQL)
- API REST (Spring Boot)
- IA para decisiones de juego
- Modo carrera
- Multiplayer
- Migración a JavaFX
-👨‍💻 13. Autor
-Pablo
-Proyecto académico avanzado orientado a simulación deportiva y arquitectura software.
+---
 
-📄 14. Licencia
+## 📊 11. Datos iniciales
+
+El archivo `data/equipos.csv` permite inicializar equipos automáticamente al arrancar la aplicación.
+
+---
+
+## 💡 12. Mejoras futuras
+
+- [ ] Base de datos (MySQL)
+- [ ] API REST (Spring Boot)
+- [ ] IA para decisiones de juego
+- [ ] Modo carrera
+- [ ] Multiplayer
+- [ ] Migración a JavaFX
+
+---
+
+## 👨‍💻 13. Autor
+
+**Pablo** — Proyecto académico avanzado orientado a simulación deportiva y arquitectura software.
+
+---
+
+## 📄 14. Licencia
+
 Uso educativo. Libre para modificar.
 
-⭐ 15. Contribuir
-Haz un Fork 🍴
-Crea tu Branch 🚀 (git checkout -b feature/NuevaCaracteristica)
-Haz Commit (git commit -m 'Añadir nueva característica')
-Abre un Pull Request
-🏁 16. Conclusión
+---
+
+## ⭐ 15. Contribuir
+
+1. Haz un **Fork** 🍴
+2. Crea tu branch: `git checkout -b feature/NuevaCaracteristica` 🚀
+3. Haz commit: `git commit -m 'Añadir nueva característica'`
+4. Abre un **Pull Request**
+
+---
+
+## 🏁 16. Conclusión
+
 Este proyecto representa una implementación completa de:
 
-✔️ Arquitectura limpia
-✔️ Simulación realista
-✔️ Interfaz gráfica funcional
-✔️ Buenas prácticas de desarrollo
-PlainText
-
-
-¡Espero que te sea de mucha utilidad para destacar tu proyecto! Si necesitas ayuda redactando alguna otra parte o puliendo algún texto, estaré encantado de ayudarte. ¡Mucho éxito con *Proyecto Champions*!
+- ✔️ Arquitectura limpia
+- ✔️ Simulación realista
+- ✔️ Interfaz gráfica funcional
+- ✔️ Buenas prácticas de desarrollo
