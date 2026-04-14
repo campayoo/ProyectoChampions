@@ -67,7 +67,7 @@ Proyecto_Champions/
 │   └── MercadoFichajes.java
 │
 └── Main.java           # Punto de entrada
-```
+´´´
 ---
 ## ⚙️ 6. Funcionalidades
 🧍 Jugadores: Creación de perfiles con atributos personalizados y sistema de transferencias.
