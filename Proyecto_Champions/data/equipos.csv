@@ -3,274 +3,274 @@
 # JUGADOR,nombreEquipo,id,nombre,edad,nacion,posicion,ataque,defensa,energia,velocidad,valor
 tipo,nombre,pais,presupuesto,nombreEntrenador,edadEnt,nacionEnt,estilo,exp,formacion
 
-EQUIPO,Real Madrid,España,200.0,Carlo Ancelotti,62,Italia,EQUILIBRADO,25,4-3-3
-JUGADOR,Real Madrid,1,Thibaut Courtois,32,Bélgica,POR,82,90,80,65,75.0
-JUGADOR,Real Madrid,2,Dani Carvajal,32,España,DEF,72,84,83,85,60.0
-JUGADOR,Real Madrid,3,Eder Militao,25,Brasil,DEF,65,85,82,78,55.0
-JUGADOR,Real Madrid,4,Antonio Rüdiger,31,Alemania,DEF,62,88,83,75,50.0
-JUGADOR,Real Madrid,5,Ferland Mendy,29,Francia,DEF,68,82,80,82,50.0
-JUGADOR,Real Madrid,6,Luka Modrić,38,Croacia,MED,74,72,88,78,40.0
-JUGADOR,Real Madrid,7,Toni Kroos,34,Alemania,MED,76,68,87,72,40.0
-JUGADOR,Real Madrid,8,Federico Valverde,25,Uruguay,MED,79,75,85,84,80.0
-JUGADOR,Real Madrid,9,Aurélien Tchouaméni,24,Francia,MED,74,78,83,80,70.0
-JUGADOR,Real Madrid,10,Vinícius Jr,23,Brasil,DEL,90,45,88,96,100.0
-JUGADOR,Real Madrid,11,Joselu,34,España,DEL,80,50,80,72,30.0
-JUGADOR,Real Madrid,12,Rodrygo,23,Brasil,DEL,84,46,84,88,65.0
-JUGADOR,Real Madrid,13,Nacho,34,España,DEF,60,82,78,70,25.0
-JUGADOR,Real Madrid,14,Eduardo Camavinga,21,Francia,MED,76,72,82,80,60.0
-JUGADOR,Real Madrid,15,Brahim Díaz,25,España,DEL,78,46,80,82,35.0
+EQUIPO,Real Madrid,España,220.0,Alvaro Arbeloa,44,España,EQUILIBRADO,26,4-3-3
+JUGADOR,Real Madrid,1,Thibaut Courtois,33,Bélgica,POR,83,91,80,65,80.0
+JUGADOR,Real Madrid,2,Dani Carvajal,33,España,DEF,72,84,82,84,55.0
+JUGADOR,Real Madrid,3,Eder Militao,26,Brasil,DEF,66,85,82,78,60.0
+JUGADOR,Real Madrid,4,Antonio Rüdiger,32,Alemania,DEF,63,88,83,75,50.0
+JUGADOR,Real Madrid,5,Dean Huijsen,20,España,DEF,65,83,81,76,55.0
+JUGADOR,Real Madrid,6,Álvaro Carreras,22,España,DEF,70,80,82,84,45.0
+JUGADOR,Real Madrid,7,Trent Alexander-Arnold,27,Inglaterra,DEF,80,82,84,82,90.0
+JUGADOR,Real Madrid,8,Federico Valverde,26,Uruguay,MED,80,76,86,85,90.0
+JUGADOR,Real Madrid,9,Aurélien Tchouaméni,25,Francia,MED,75,80,84,80,80.0
+JUGADOR,Real Madrid,10,Eduardo Camavinga,22,Francia,MED,77,73,83,81,70.0
+JUGADOR,Real Madrid,11,Jude Bellingham,22,Inglaterra,MED,88,72,88,84,150.0
+JUGADOR,Real Madrid,12,Vinícius Jr,24,Brasil,DEL,91,46,89,96,120.0
+JUGADOR,Real Madrid,13,Kylian Mbappé,26,Francia,DEL,93,58,91,97,200.0
+JUGADOR,Real Madrid,14,Rodrygo,24,Brasil,DEL,84,46,84,88,70.0
+JUGADOR,Real Madrid,15,Raúl Asencio,22,España,DEF,63,82,80,74,25.0
 
-EQUIPO,FC Barcelona,España,175.0,Hansi Flick,44,España,OFENSIVO,8,4-3-3
-JUGADOR,FC Barcelona,16,Marc-André ter Stegen,32,Alemania,POR,80,88,78,60,70.0
-JUGADOR,FC Barcelona,17,Jules Koundé,25,Francia,DEF,74,83,80,83,65.0
-JUGADOR,FC Barcelona,18,Alejandro Balde,20,España,DEF,70,80,79,86,45.0
-JUGADOR,FC Barcelona,19,Íñigo Martínez,32,España,DEF,63,86,79,72,30.0
-JUGADOR,FC Barcelona,20,Andreas Christensen,28,Dinamarca,DEF,64,84,78,72,40.0
-JUGADOR,FC Barcelona,21,Pedri,21,España,MED,76,70,88,80,75.0
-JUGADOR,FC Barcelona,22,Gavi,19,España,MED,74,72,86,80,65.0
-JUGADOR,FC Barcelona,23,Frenkie de Jong,26,Países Bajos,MED,75,71,85,80,75.0
-JUGADOR,FC Barcelona,24,İlkay Gündoğan,33,Alemania,MED,76,72,84,76,55.0
-JUGADOR,FC Barcelona,25,Robert Lewandowski,35,Polonia,DEL,85,52,86,78,90.0
-JUGADOR,FC Barcelona,26,Ferran Torres,24,España,DEL,80,50,82,85,55.0
-JUGADOR,FC Barcelona,27,Ansu Fati,21,España,DEL,82,47,80,86,45.0
-JUGADOR,FC Barcelona,28,João Félix,24,Portugal,DEL,83,48,82,84,60.0
-JUGADOR,FC Barcelona,29,Raphinha,27,Brasil,DEL,82,46,83,87,60.0
-JUGADOR,FC Barcelona,30,Sergi Roberto,32,España,MED,68,68,78,76,15.0
+EQUIPO,FC Barcelona,España,190.0,Hansi Flick,60,Alemania,OFENSIVO,9,4-2-3-1
+JUGADOR,FC Barcelona,16,Joan García,24,España,POR,80,86,77,62,35.0
+JUGADOR,FC Barcelona,17,Jules Koundé,26,Francia,DEF,75,84,81,83,70.0
+JUGADOR,FC Barcelona,18,Alejandro Balde,21,España,DEF,72,81,80,87,55.0
+JUGADOR,FC Barcelona,19,Pau Cubarsí,18,España,DEF,66,83,80,74,50.0
+JUGADOR,FC Barcelona,20,Ronald Araújo,26,Uruguay,DEF,66,87,82,74,70.0
+JUGADOR,FC Barcelona,21,Pedri,22,España,MED,78,72,89,81,85.0
+JUGADOR,FC Barcelona,22,Gavi,20,España,MED,75,73,87,81,70.0
+JUGADOR,FC Barcelona,23,Marc Bernal,18,España,MED,74,70,83,79,35.0
+JUGADOR,FC Barcelona,24,Frenkie de Jong,27,Países Bajos,MED,76,72,85,80,70.0
+JUGADOR,FC Barcelona,25,Robert Lewandowski,36,Polonia,DEL,84,52,85,76,80.0
+JUGADOR,FC Barcelona,26,Lamine Yamal,18,España,DEL,87,52,85,92,120.0
+JUGADOR,FC Barcelona,27,Raphinha,28,Brasil,DEL,84,48,84,88,70.0
+JUGADOR,FC Barcelona,28,Fermín López,22,España,MED,78,68,83,80,45.0
+JUGADOR,FC Barcelona,29,Marcus Rashford,27,Inglaterra,DEL,82,52,82,86,55.0
+JUGADOR,FC Barcelona,30,İlkay Gündoğan,34,Alemania,MED,74,72,82,74,40.0
 
-EQUIPO,Manchester City,Inglaterra,230.0,Pep Guardiola,53,España,OFENSIVO,16,4-3-3
-JUGADOR,Manchester City,31,Ederson,30,Brasil,POR,82,89,79,60,65.0
-JUGADOR,Manchester City,32,Kyle Walker,33,Inglaterra,DEF,72,84,83,88,65.0
-JUGADOR,Manchester City,33,Rúben Dias,26,Portugal,DEF,66,88,83,75,90.0
-JUGADOR,Manchester City,34,Manuel Akanji,28,Suiza,DEF,65,86,82,76,55.0
-JUGADOR,Manchester City,35,Joško Gvardiol,21,Croacia,DEF,67,85,83,78,60.0
-JUGADOR,Manchester City,36,Kevin De Bruyne,32,Bélgica,MED,88,70,88,82,100.0
-JUGADOR,Manchester City,37,Rodri,27,España,MED,76,82,88,76,90.0
-JUGADOR,Manchester City,38,Bernardo Silva,29,Portugal,MED,82,72,87,84,80.0
-JUGADOR,Manchester City,39,Phil Foden,23,Inglaterra,MED,85,68,86,86,90.0
-JUGADOR,Manchester City,40,Erling Haaland,23,Noruega,DEL,92,42,86,90,150.0
-JUGADOR,Manchester City,41,Julián Álvarez,24,Argentina,DEL,83,56,86,84,70.0
-JUGADOR,Manchester City,42,Jack Grealish,28,Inglaterra,DEL,80,50,83,82,60.0
-JUGADOR,Manchester City,43,Jeremy Doku,21,Bélgica,DEL,82,44,82,92,50.0
-JUGADOR,Manchester City,44,Matheus Nunes,25,Portugal,MED,77,72,83,82,45.0
-JUGADOR,Manchester City,45,Stefan Ortega,31,Alemania,POR,77,85,76,56,18.0
+EQUIPO,Manchester City,Inglaterra,240.0,Pep Guardiola,54,España,OFENSIVO,17,4-3-3
+JUGADOR,Manchester City,31,Ederson,31,Brasil,POR,82,89,78,60,65.0
+JUGADOR,Manchester City,32,Kyle Walker,34,Inglaterra,DEF,71,83,82,86,55.0
+JUGADOR,Manchester City,33,Rúben Dias,27,Portugal,DEF,66,89,83,75,95.0
+JUGADOR,Manchester City,34,Manuel Akanji,29,Suiza,DEF,65,87,82,76,55.0
+JUGADOR,Manchester City,35,Joško Gvardiol,22,Croacia,DEF,68,86,84,79,70.0
+JUGADOR,Manchester City,36,Kevin De Bruyne,33,Bélgica,MED,87,70,87,81,90.0
+JUGADOR,Manchester City,37,Rodri,28,España,MED,77,83,88,76,95.0
+JUGADOR,Manchester City,38,Bernardo Silva,30,Portugal,MED,83,72,87,84,80.0
+JUGADOR,Manchester City,39,Phil Foden,24,Inglaterra,MED,86,68,86,86,95.0
+JUGADOR,Manchester City,40,Erling Haaland,24,Noruega,DEL,93,43,86,90,180.0
+JUGADOR,Manchester City,41,Julián Álvarez,25,Argentina,DEL,83,56,86,84,70.0
+JUGADOR,Manchester City,42,Jack Grealish,29,Inglaterra,DEL,80,50,82,82,55.0
+JUGADOR,Manchester City,43,Gianluigi Donnarumma,26,Italia,POR,82,88,78,60,70.0
+JUGADOR,Manchester City,44,Matheus Nunes,26,Portugal,MED,78,72,83,82,45.0
+JUGADOR,Manchester City,45,Stefan Ortega,32,Alemania,POR,77,85,76,56,18.0
 
-EQUIPO,Bayern Munich,Alemania,195.0,Thomas Tuchel,50,Alemania,EQUILIBRADO,12,4-2-3-1
-JUGADOR,Bayern Munich,46,Manuel Neuer,37,Alemania,POR,80,90,78,60,35.0
-JUGADOR,Bayern Munich,47,Josip Stanišić,23,Croacia,DEF,70,80,79,82,30.0
-JUGADOR,Bayern Munich,48,Matthijs de Ligt,24,Países Bajos,DEF,66,86,82,74,65.0
-JUGADOR,Bayern Munich,49,Dayot Upamecano,25,Francia,DEF,67,85,82,76,65.0
-JUGADOR,Bayern Munich,50,Alphonso Davies,23,Canadá,DEF,74,78,82,90,70.0
-JUGADOR,Bayern Munich,51,Joshua Kimmich,29,Alemania,MED,78,80,88,78,80.0
-JUGADOR,Bayern Munich,52,Leon Goretzka,29,Alemania,MED,77,78,86,80,55.0
-JUGADOR,Bayern Munich,53,Leroy Sané,28,Alemania,MED,84,62,84,90,70.0
-JUGADOR,Bayern Munich,54,Jamal Musiala,21,Alemania,MED,87,66,86,86,100.0
-JUGADOR,Bayern Munich,55,Harry Kane,30,Inglaterra,DEL,88,52,87,78,100.0
-JUGADOR,Bayern Munich,56,Thomas Müller,34,Alemania,DEL,76,62,82,76,35.0
-JUGADOR,Bayern Munich,57,Serge Gnabry,28,Alemania,DEL,82,52,83,86,55.0
-JUGADOR,Bayern Munich,58,Eric Maxim Choupo-Moting,35,Camerún,DEL,78,52,80,72,18.0
-JUGADOR,Bayern Munich,59,Sven Ulreich,35,Alemania,POR,74,83,73,54,10.0
-JUGADOR,Bayern Munich,60,Noussair Mazraoui,26,Marruecos,DEF,72,80,80,82,35.0
+EQUIPO,Bayern Munich,Alemania,210.0,Vincent Kompany,39,Bélgica,OFENSIVO,2,4-2-3-1
+JUGADOR,Bayern Munich,46,Manuel Neuer,39,Alemania,POR,79,90,77,58,30.0
+JUGADOR,Bayern Munich,47,Josip Stanišić,24,Croacia,DEF,71,80,80,82,30.0
+JUGADOR,Bayern Munich,48,Dayot Upamecano,26,Francia,DEF,67,86,82,76,65.0
+JUGADOR,Bayern Munich,49,Jonathan Tah,29,Alemania,DEF,67,86,82,74,55.0
+JUGADOR,Bayern Munich,50,Alphonso Davies,24,Canadá,DEF,75,79,83,91,75.0
+JUGADOR,Bayern Munich,51,Joshua Kimmich,30,Alemania,MED,79,81,88,78,80.0
+JUGADOR,Bayern Munich,52,Leon Goretzka,30,Alemania,MED,78,78,86,80,55.0
+JUGADOR,Bayern Munich,53,Michael Olise,23,Francia,MED,86,62,85,90,90.0
+JUGADOR,Bayern Munich,54,Jamal Musiala,22,Alemania,MED,88,66,87,87,120.0
+JUGADOR,Bayern Munich,55,Harry Kane,31,Inglaterra,DEL,89,52,87,78,110.0
+JUGADOR,Bayern Munich,56,Serge Gnabry,29,Alemania,DEL,82,52,83,86,55.0
+JUGADOR,Bayern Munich,57,Luis Díaz,28,Colombia,DEL,85,52,85,89,80.0
+JUGADOR,Bayern Munich,58,Thomas Müller,35,Alemania,DEL,74,60,80,73,25.0
+JUGADOR,Bayern Munich,59,Sven Ulreich,36,Alemania,POR,74,83,73,54,10.0
+JUGADOR,Bayern Munich,60,Min-jae Kim,28,Corea del Sur,DEF,67,85,83,76,65.0
 
-EQUIPO,Paris Saint-Germain,Francia,220.0,Luis Enrique,53,España,OFENSIVO,10,4-3-3
-JUGADOR,Paris Saint-Germain,61,Gianluigi Donnarumma,25,Italia,POR,80,88,76,60,60.0
-JUGADOR,Paris Saint-Germain,62,Achraf Hakimi,25,Marruecos,DEF,76,82,82,88,70.0
-JUGADOR,Paris Saint-Germain,63,Presnel Kimpembe,28,Francia,DEF,63,83,80,73,35.0
-JUGADOR,Paris Saint-Germain,64,Marquinhos,30,Brasil,DEF,68,82,85,75,70.0
-JUGADOR,Paris Saint-Germain,65,Nuno Mendes,21,Portugal,DEF,72,78,82,86,55.0
-JUGADOR,Paris Saint-Germain,66,Marco Verratti,31,Italia,MED,80,72,86,78,55.0
-JUGADOR,Paris Saint-Germain,67,Vitinha,24,Portugal,MED,80,72,85,78,60.0
-JUGADOR,Paris Saint-Germain,68,Fabián Ruiz,27,España,MED,78,70,83,76,50.0
-JUGADOR,Paris Saint-Germain,69,Ousmane Dembélé,26,Francia,DEL,86,46,84,90,80.0
-JUGADOR,Paris Saint-Germain,70,Kylian Mbappé,25,Francia,DEL,92,58,90,97,180.0
-JUGADOR,Paris Saint-Germain,71,Randal Kolo Muani,25,Francia,DEL,84,52,84,86,80.0
-JUGADOR,Paris Saint-Germain,72,Gonçalo Ramos,22,Portugal,DEL,82,52,84,80,60.0
-JUGADOR,Paris Saint-Germain,73,Lee Kang-in,23,Corea del Sur,MED,80,68,82,80,40.0
-JUGADOR,Paris Saint-Germain,74,Lucas Hernández,27,Francia,DEF,64,82,80,74,35.0
-JUGADOR,Paris Saint-Germain,75,Danilo,32,Brasil,DEF,70,80,80,80,25.0
+EQUIPO,Paris Saint-Germain,Francia,230.0,Luis Enrique,54,España,OFENSIVO,11,4-3-3
+JUGADOR,Paris Saint-Germain,61,Matvey Safonov,25,Rusia,POR,79,86,76,60,45.0
+JUGADOR,Paris Saint-Germain,62,Achraf Hakimi,26,Marruecos,DEF,77,83,83,89,75.0
+JUGADOR,Paris Saint-Germain,63,William Pacho,23,Ecuador,DEF,65,84,81,74,40.0
+JUGADOR,Paris Saint-Germain,64,Marquinhos,31,Brasil,DEF,68,83,86,75,70.0
+JUGADOR,Paris Saint-Germain,65,Nuno Mendes,22,Portugal,DEF,73,79,83,87,60.0
+JUGADOR,Paris Saint-Germain,66,João Neves,20,Portugal,MED,81,74,86,80,80.0
+JUGADOR,Paris Saint-Germain,67,Vitinha,25,Portugal,MED,81,72,86,79,65.0
+JUGADOR,Paris Saint-Germain,68,Warren Zaïre-Emery,19,Francia,MED,80,70,85,82,70.0
+JUGADOR,Paris Saint-Germain,69,Ousmane Dembélé,27,Francia,DEL,87,47,85,91,90.0
+JUGADOR,Paris Saint-Germain,70,Désiré Doué,20,Francia,DEL,84,48,84,88,70.0
+JUGADOR,Paris Saint-Germain,71,Khvicha Kvaratskhelia,24,Georgia,DEL,89,51,87,89,110.0
+JUGADOR,Paris Saint-Germain,72,Gonçalo Ramos,23,Portugal,DEL,83,52,84,80,65.0
+JUGADOR,Paris Saint-Germain,73,Lee Kang-in,24,Corea del Sur,MED,80,68,82,80,40.0
+JUGADOR,Paris Saint-Germain,74,Lucas Hernández,28,Francia,DEF,64,82,80,74,35.0
+JUGADOR,Paris Saint-Germain,75,Senny Mayulu,19,Francia,DEL,78,46,80,84,20.0
 
-EQUIPO,Liverpool,Inglaterra,180.0,Jürgen Klopp,56,Alemania,OFENSIVO,16,4-3-3
-JUGADOR,Liverpool,76,Alisson Becker,31,Brasil,POR,82,90,80,62,70.0
-JUGADOR,Liverpool,77,Trent Alexander-Arnold,25,Inglaterra,DEF,78,82,84,82,80.0
-JUGADOR,Liverpool,78,Virgil van Dijk,32,Países Bajos,DEF,68,88,86,78,80.0
-JUGADOR,Liverpool,79,Ibrahima Konaté,25,Francia,DEF,68,84,82,78,60.0
-JUGADOR,Liverpool,80,Andrew Robertson,29,Escocia,DEF,74,80,82,84,65.0
-JUGADOR,Liverpool,81,Alexis Mac Allister,25,Argentina,MED,78,74,85,80,65.0
-JUGADOR,Liverpool,82,Dominik Szoboszlai,23,Hungría,MED,80,72,86,82,70.0
-JUGADOR,Liverpool,83,Harvey Elliott,20,Inglaterra,MED,78,68,83,82,40.0
-JUGADOR,Liverpool,84,Mohamed Salah,31,Egipto,DEL,88,60,86,90,100.0
-JUGADOR,Liverpool,85,Darwin Núñez,24,Uruguay,DEL,85,52,86,88,75.0
-JUGADOR,Liverpool,86,Luis Díaz,27,Colombia,DEL,84,52,84,88,70.0
-JUGADOR,Liverpool,87,Diogo Jota,27,Portugal,DEL,82,52,84,82,55.0
-JUGADOR,Liverpool,88,Cody Gakpo,24,Países Bajos,DEL,82,52,84,84,55.0
-JUGADOR,Liverpool,89,Wataru Endo,30,Japón,MED,73,78,82,74,25.0
-JUGADOR,Liverpool,90,Caoimhín Kelleher,25,Irlanda,POR,75,83,74,55,15.0
+EQUIPO,Liverpool,Inglaterra,185.0,Arne Slot,47,Países Bajos,OFENSIVO,2,4-3-3
+JUGADOR,Liverpool,76,Giorgi Mamardashvili,24,Georgia,POR,81,88,79,62,50.0
+JUGADOR,Liverpool,77,Jeremie Frimpong,24,Países Bajos,DEF,76,80,84,90,55.0
+JUGADOR,Liverpool,78,Virgil van Dijk,33,Países Bajos,DEF,68,88,85,77,75.0
+JUGADOR,Liverpool,79,Ibrahima Konaté,26,Francia,DEF,68,85,83,79,65.0
+JUGADOR,Liverpool,80,Milos Kerkez,22,Hungría,DEF,70,78,81,84,35.0
+JUGADOR,Liverpool,81,Alexis Mac Allister,26,Argentina,MED,79,75,86,81,70.0
+JUGADOR,Liverpool,82,Dominik Szoboszlai,24,Hungría,MED,81,72,87,83,75.0
+JUGADOR,Liverpool,83,Ryan Gravenberch,23,Países Bajos,MED,80,74,86,80,65.0
+JUGADOR,Liverpool,84,Mohamed Salah,32,Egipto,DEL,88,60,85,89,100.0
+JUGADOR,Liverpool,85,Florian Wirtz,22,Alemania,DEL,89,60,87,86,130.0
+JUGADOR,Liverpool,86,Hugo Ekitike,23,Francia,DEL,82,50,83,86,55.0
+JUGADOR,Liverpool,87,Harvey Elliott,21,Inglaterra,MED,78,68,83,82,40.0
+JUGADOR,Liverpool,88,Joe Gomez,27,Inglaterra,DEF,66,82,81,76,35.0
+JUGADOR,Liverpool,89,Caoimhín Kelleher,26,Irlanda,POR,76,84,75,55,20.0
+JUGADOR,Liverpool,90,Curtis Jones,24,Inglaterra,MED,76,72,83,78,30.0
 
-EQUIPO,Chelsea,Inglaterra,160.0,Mauricio Pochettino,51,Argentina,EQUILIBRADO,14,4-2-3-1
-JUGADOR,Chelsea,91,Robert Sánchez,26,España,POR,77,86,76,62,35.0
-JUGADOR,Chelsea,92,Reece James,24,Inglaterra,DEF,74,83,82,84,60.0
-JUGADOR,Chelsea,93,Thiago Silva,39,Brasil,DEF,64,86,84,68,25.0
-JUGADOR,Chelsea,94,Levi Colwill,21,Inglaterra,DEF,66,82,80,74,35.0
-JUGADOR,Chelsea,95,Ben Chilwell,27,Inglaterra,DEF,70,78,80,82,40.0
-JUGADOR,Chelsea,96,Enzo Fernández,23,Argentina,MED,78,72,84,78,80.0
-JUGADOR,Chelsea,97,Moisés Caicedo,22,Ecuador,MED,76,78,84,78,70.0
-JUGADOR,Chelsea,98,Cole Palmer,22,Inglaterra,MED,84,64,85,84,80.0
-JUGADOR,Chelsea,99,Raheem Sterling,29,Inglaterra,DEL,83,54,83,88,55.0
-JUGADOR,Chelsea,100,Nicolas Jackson,22,Senegal,DEL,82,52,84,84,60.0
-JUGADOR,Chelsea,101,Christopher Nkunku,26,Francia,DEL,84,54,84,82,80.0
-JUGADOR,Chelsea,102,Conor Gallagher,24,Inglaterra,MED,74,74,83,78,40.0
-JUGADOR,Chelsea,103,Noni Madueke,22,Inglaterra,DEL,80,50,82,86,40.0
-JUGADOR,Chelsea,104,Malo Gusto,20,Francia,DEF,70,80,79,82,30.0
-JUGADOR,Chelsea,105,Djordje Petrovic,24,Serbia,POR,74,83,73,56,15.0
+EQUIPO,Chelsea,Inglaterra,170.0,Liam Rosenior,40,Inglaterra,EQUILIBRADO,1,4-2-3-1
+JUGADOR,Chelsea,91,Robert Sánchez,27,España,POR,77,86,76,62,35.0
+JUGADOR,Chelsea,92,Reece James,25,Inglaterra,DEF,74,83,82,84,60.0
+JUGADOR,Chelsea,93,Wesley Fofana,24,Francia,DEF,67,84,82,76,55.0
+JUGADOR,Chelsea,94,Levi Colwill,22,Inglaterra,DEF,67,83,81,75,40.0
+JUGADOR,Chelsea,95,Ben Chilwell,28,Inglaterra,DEF,70,78,80,82,40.0
+JUGADOR,Chelsea,96,Enzo Fernández,24,Argentina,MED,79,72,85,79,85.0
+JUGADOR,Chelsea,97,Moisés Caicedo,23,Ecuador,MED,77,79,85,79,75.0
+JUGADOR,Chelsea,98,Cole Palmer,23,Inglaterra,MED,86,64,86,85,100.0
+JUGADOR,Chelsea,99,Pedro Neto,25,Portugal,DEL,83,52,83,88,65.0
+JUGADOR,Chelsea,100,Nicolas Jackson,23,Senegal,DEL,83,52,84,85,65.0
+JUGADOR,Chelsea,101,Christopher Nkunku,27,Francia,DEL,84,54,84,82,80.0
+JUGADOR,Chelsea,102,Joao Felix,25,Portugal,DEL,83,48,82,84,60.0
+JUGADOR,Chelsea,103,Noni Madueke,23,Inglaterra,DEL,81,50,82,87,45.0
+JUGADOR,Chelsea,104,Malo Gusto,21,Francia,DEF,71,81,80,83,35.0
+JUGADOR,Chelsea,105,Filip Jörgensen,22,Dinamarca,POR,75,84,74,57,20.0
 
-EQUIPO,Atlético de Madrid,España,145.0,Diego Simeone,54,Argentina,DEFENSIVO,14,4-4-2
-JUGADOR,Atlético de Madrid,106,Jan Oblak,31,Eslovenia,POR,84,90,78,60,90.0
-JUGADOR,Atlético de Madrid,107,Nahuel Molina,25,Argentina,DEF,72,80,82,84,50.0
-JUGADOR,Atlético de Madrid,108,José María Giménez,29,Uruguay,DEF,64,86,82,73,50.0
-JUGADOR,Atlético de Madrid,109,Axel Witsel,35,Bélgica,DEF,64,82,80,70,30.0
-JUGADOR,Atlético de Madrid,110,Reinildo,30,Mozambique,DEF,68,82,80,78,25.0
-JUGADOR,Atlético de Madrid,111,Koke,32,España,MED,74,72,86,76,50.0
-JUGADOR,Atlético de Madrid,112,Rodrigo De Paul,30,Argentina,MED,76,74,86,78,70.0
-JUGADOR,Atlético de Madrid,113,Saúl Ñíguez,29,España,MED,74,74,84,76,35.0
-JUGADOR,Atlético de Madrid,114,Antoine Griezmann,33,Francia,DEL,84,64,86,80,85.0
-JUGADOR,Atlético de Madrid,115,Álvaro Morata,31,España,DEL,80,56,84,78,50.0
-JUGADOR,Atlético de Madrid,116,Ángel Correa,29,Argentina,DEL,78,58,83,80,40.0
-JUGADOR,Atlético de Madrid,117,Memphis Depay,30,Países Bajos,DEL,82,52,82,82,25.0
-JUGADOR,Atlético de Madrid,118,Geoffrey Kondogbia,31,Guinea Ecuatorial,MED,72,76,82,74,20.0
-JUGADOR,Atlético de Madrid,119,Marcos Llorente,29,España,MED,76,74,83,80,55.0
-JUGADOR,Atlético de Madrid,120,Stefan Savić,33,Montenegro,DEF,63,85,80,71,20.0
+EQUIPO,Atlético de Madrid,España,150.0,Diego Simeone,55,Argentina,DEFENSIVO,15,4-4-2
+JUGADOR,Atlético de Madrid,106,Jan Oblak,32,Eslovenia,POR,84,91,78,60,90.0
+JUGADOR,Atlético de Madrid,107,Nahuel Molina,26,Argentina,DEF,73,81,83,85,55.0
+JUGADOR,Atlético de Madrid,108,José María Giménez,30,Uruguay,DEF,64,87,82,73,50.0
+JUGADOR,Atlético de Madrid,109,Robin Le Normand,28,España,DEF,65,85,82,73,45.0
+JUGADOR,Atlético de Madrid,110,Reinildo,31,Mozambique,DEF,68,82,80,78,25.0
+JUGADOR,Atlético de Madrid,111,Koke,33,España,MED,73,72,85,74,45.0
+JUGADOR,Atlético de Madrid,112,Rodrigo De Paul,31,Argentina,MED,76,74,86,78,65.0
+JUGADOR,Atlético de Madrid,113,Marcos Llorente,30,España,MED,77,74,84,81,55.0
+JUGADOR,Atlético de Madrid,114,Antoine Griezmann,34,Francia,DEL,83,64,85,79,80.0
+JUGADOR,Atlético de Madrid,115,Julián Álvarez,25,Argentina,DEL,87,58,87,85,100.0
+JUGADOR,Atlético de Madrid,116,Ángel Correa,30,Argentina,DEL,78,58,83,80,40.0
+JUGADOR,Atlético de Madrid,117,Samuel Lino,26,Brasil,DEL,80,48,82,86,35.0
+JUGADOR,Atlético de Madrid,118,Conor Gallagher,25,Inglaterra,MED,76,76,84,80,50.0
+JUGADOR,Atlético de Madrid,119,Alexander Sörloth,29,Noruega,DEL,80,52,82,76,35.0
+JUGADOR,Atlético de Madrid,120,César Azpilicueta,35,España,DEF,64,80,79,72,10.0
 
-EQUIPO,Juventus,Italia,155.0,Massimiliano Allegri,56,Italia,DEFENSIVO,12,3-5-2
-JUGADOR,Juventus,121,Wojciech Szczęsny,33,Polonia,POR,79,88,77,60,50.0
-JUGADOR,Juventus,122,Danilo,32,Brasil,DEF,70,80,80,80,35.0
-JUGADOR,Juventus,123,Gleison Bremer,27,Brasil,DEF,66,85,82,74,65.0
-JUGADOR,Juventus,124,Federico Gatti,25,Italia,DEF,64,82,79,72,20.0
-JUGADOR,Juventus,125,Álex Sandro,33,Brasil,DEF,66,78,79,78,20.0
-JUGADOR,Juventus,126,Adrien Rabiot,28,Francia,MED,77,72,84,78,50.0
-JUGADOR,Juventus,127,Manuel Locatelli,26,Italia,MED,74,76,83,74,45.0
-JUGADOR,Juventus,128,Filip Kostić,31,Serbia,MED,76,68,82,80,35.0
-JUGADOR,Juventus,129,Federico Chiesa,26,Italia,DEL,84,52,83,86,70.0
-JUGADOR,Juventus,130,Dušan Vlahović,24,Serbia,DEL,86,52,85,78,90.0
-JUGADOR,Juventus,131,Moise Kean,24,Italia,DEL,80,52,82,78,30.0
-JUGADOR,Juventus,132,Arkadiusz Milik,30,Polonia,DEL,80,52,82,76,18.0
-JUGADOR,Juventus,133,Nicolò Fagioli,22,Italia,MED,76,68,81,76,25.0
-JUGADOR,Juventus,134,Mattia Perin,31,Italia,POR,75,85,74,56,15.0
-JUGADOR,Juventus,135,Andrea Cambiaso,23,Italia,DEF,72,78,80,80,30.0
+EQUIPO,Juventus,Italia,160.0,Thiago Motta,43,Italia,OFENSIVO,2,4-2-3-1
+JUGADOR,Juventus,121,Michele Di Gregorio,27,Italia,POR,78,86,77,60,35.0
+JUGADOR,Juventus,122,Danilo,33,Brasil,DEF,69,79,79,79,25.0
+JUGADOR,Juventus,123,Gleison Bremer,28,Brasil,DEF,66,86,83,74,70.0
+JUGADOR,Juventus,124,Federico Gatti,26,Italia,DEF,65,83,80,73,25.0
+JUGADOR,Juventus,125,Andrea Cambiaso,24,Italia,DEF,74,79,81,82,45.0
+JUGADOR,Juventus,126,Manuel Locatelli,27,Italia,MED,75,77,84,75,45.0
+JUGADOR,Juventus,127,Khéphren Thuram,23,Francia,MED,78,74,85,80,60.0
+JUGADOR,Juventus,128,Douglas Luiz,27,Brasil,MED,78,74,84,78,55.0
+JUGADOR,Juventus,129,Federico Chiesa,27,Italia,DEL,84,52,83,86,70.0
+JUGADOR,Juventus,130,Dušan Vlahović,25,Serbia,DEL,87,52,86,78,100.0
+JUGADOR,Juventus,131,Teun Koopmeiners,27,Países Bajos,MED,82,70,85,78,75.0
+JUGADOR,Juventus,132,Timothy Weah,24,Estados Unidos,DEL,79,50,81,86,35.0
+JUGADOR,Juventus,133,Nicolò Fagioli,23,Italia,MED,77,68,82,77,30.0
+JUGADOR,Juventus,134,Carlo Pinsoglio,33,Italia,POR,68,82,68,54,5.0
+JUGADOR,Juventus,135,Weston McKennie,26,Estados Unidos,MED,76,72,83,78,30.0
 
-EQUIPO,Inter Milan,Italia,150.0,Simone Inzaghi,47,Italia,EQUILIBRADO,9,3-5-2
-JUGADOR,Inter Milan,136,André Onana,27,Camerún,POR,80,87,78,62,60.0
-JUGADOR,Inter Milan,137,Denzel Dumfries,28,Países Bajos,DEF,74,78,82,86,45.0
-JUGADOR,Inter Milan,138,Stefan de Vrij,32,Países Bajos,DEF,64,84,82,72,40.0
-JUGADOR,Inter Milan,139,Alessandro Bastoni,24,Italia,DEF,67,78,84,76,70.0
-JUGADOR,Inter Milan,140,Federico Dimarco,26,Italia,DEF,74,76,82,82,50.0
-JUGADOR,Inter Milan,141,Nicolò Barella,27,Italia,MED,82,72,87,82,85.0
-JUGADOR,Inter Milan,142,Hakan Çalhanoğlu,30,Turquía,MED,82,72,86,78,70.0
-JUGADOR,Inter Milan,143,Henrikh Mkhitaryan,35,Armenia,MED,76,70,82,76,25.0
-JUGADOR,Inter Milan,144,Lautaro Martínez,26,Argentina,DEL,87,55,86,84,110.0
-JUGADOR,Inter Milan,145,Marcus Thuram,26,Francia,DEL,84,52,85,84,70.0
-JUGADOR,Inter Milan,146,Alexis Sánchez,35,Chile,DEL,78,56,80,80,15.0
-JUGADOR,Inter Milan,147,Joaquín Correa,29,Argentina,DEL,78,50,80,82,20.0
-JUGADOR,Inter Milan,148,Carlos Augusto,25,Brasil,DEF,68,78,80,80,30.0
-JUGADOR,Inter Milan,149,Yann Sommer,35,Suiza,POR,78,87,76,58,30.0
-JUGADOR,Inter Milan,150,Kristjan Asllani,22,Albania,MED,74,70,80,76,20.0
+EQUIPO,Inter Milan,Italia,160.0,Simone Inzaghi,48,Italia,EQUILIBRADO,10,3-5-2
+JUGADOR,Inter Milan,136,Yann Sommer,36,Suiza,POR,78,87,76,57,30.0
+JUGADOR,Inter Milan,137,Denzel Dumfries,29,Países Bajos,DEF,75,79,83,87,50.0
+JUGADOR,Inter Milan,138,Stefan de Vrij,33,Países Bajos,DEF,64,84,82,71,35.0
+JUGADOR,Inter Milan,139,Alessandro Bastoni,25,Italia,DEF,68,79,85,77,80.0
+JUGADOR,Inter Milan,140,Federico Dimarco,27,Italia,DEF,75,77,83,83,60.0
+JUGADOR,Inter Milan,141,Nicolò Barella,28,Italia,MED,83,73,88,83,95.0
+JUGADOR,Inter Milan,142,Hakan Çalhanoğlu,31,Turquía,MED,83,73,87,78,75.0
+JUGADOR,Inter Milan,143,Kristjan Asllani,23,Albania,MED,76,72,82,78,30.0
+JUGADOR,Inter Milan,144,Lautaro Martínez,27,Argentina,DEL,88,56,87,85,120.0
+JUGADOR,Inter Milan,145,Marcus Thuram,27,Francia,DEL,85,52,86,85,80.0
+JUGADOR,Inter Milan,146,Mehdi Taremi,32,Irán,DEL,82,54,83,78,35.0
+JUGADOR,Inter Milan,147,Joaquín Correa,30,Argentina,DEL,77,50,80,81,15.0
+JUGADOR,Inter Milan,148,Carlos Augusto,26,Brasil,DEF,69,79,81,81,35.0
+JUGADOR,Inter Milan,149,Josep Martínez,26,España,POR,78,85,77,60,30.0
+JUGADOR,Inter Milan,150,Piotr Zieliński,31,Polonia,MED,82,68,85,79,45.0
 
-EQUIPO,AC Milan,Italia,145.0,Stefano Pioli,58,Italia,OFENSIVO,10,4-2-3-1
-JUGADOR,AC Milan,151,Mike Maignan,28,Francia,POR,82,88,78,62,75.0
-JUGADOR,AC Milan,152,Davide Calabria,27,Italia,DEF,70,80,81,82,35.0
-JUGADOR,AC Milan,153,Malick Thiaw,22,Alemania,DEF,66,82,80,76,40.0
-JUGADOR,AC Milan,154,Fikayo Tomori,26,Inglaterra,DEF,67,83,82,78,50.0
-JUGADOR,AC Milan,155,Théo Hernández,26,Francia,DEF,74,80,82,86,65.0
-JUGADOR,AC Milan,156,Tijjani Reijnders,25,Países Bajos,MED,80,70,84,80,60.0
-JUGADOR,AC Milan,157,Ruben Loftus-Cheek,28,Inglaterra,MED,78,72,83,78,40.0
-JUGADOR,AC Milan,158,Yunus Musah,21,Estados Unidos,MED,76,70,83,80,40.0
-JUGADOR,AC Milan,159,Rafael Leão,24,Portugal,DEL,86,50,85,90,100.0
-JUGADOR,AC Milan,160,Olivier Giroud,37,Francia,DEL,78,56,80,70,20.0
-JUGADOR,AC Milan,161,Christian Pulisic,25,Estados Unidos,DEL,82,54,83,82,55.0
-JUGADOR,AC Milan,162,Luka Jović,26,Serbia,DEL,78,50,80,74,20.0
-JUGADOR,AC Milan,163,Samuel Chukwueze,24,Nigeria,DEL,80,46,82,84,35.0
-JUGADOR,AC Milan,164,Marco Sportiello,32,Italia,POR,74,84,73,55,10.0
-JUGADOR,AC Milan,165,Pierre Kalulu,22,Francia,DEF,68,82,80,80,30.0
+EQUIPO,AC Milan,Italia,150.0,Paulo Fonseca,52,Portugal,OFENSIVO,1,4-2-3-1
+JUGADOR,AC Milan,151,Mike Maignan,29,Francia,POR,83,89,79,63,80.0
+JUGADOR,AC Milan,152,Davide Calabria,28,Italia,DEF,70,80,81,82,30.0
+JUGADOR,AC Milan,153,Malick Thiaw,23,Alemania,DEF,67,83,81,77,45.0
+JUGADOR,AC Milan,154,Fikayo Tomori,27,Inglaterra,DEF,67,84,83,79,55.0
+JUGADOR,AC Milan,155,Théo Hernández,27,Francia,DEF,75,81,83,87,70.0
+JUGADOR,AC Milan,156,Tijjani Reijnders,26,Países Bajos,MED,81,71,85,81,70.0
+JUGADOR,AC Milan,157,Yunus Musah,22,Estados Unidos,MED,77,71,84,81,45.0
+JUGADOR,AC Milan,158,Youssouf Fofana,26,Francia,MED,78,76,85,80,55.0
+JUGADOR,AC Milan,159,Rafael Leão,25,Portugal,DEL,87,51,86,91,110.0
+JUGADOR,AC Milan,160,Álvaro Morata,32,España,DEL,79,56,82,76,35.0
+JUGADOR,AC Milan,161,Christian Pulisic,26,Estados Unidos,DEL,83,55,84,83,60.0
+JUGADOR,AC Milan,162,Luka Jović,27,Serbia,DEL,78,50,80,74,20.0
+JUGADOR,AC Milan,163,Samuel Chukwueze,25,Nigeria,DEL,80,46,82,84,35.0
+JUGADOR,AC Milan,164,Marco Sportiello,33,Italia,POR,73,84,72,54,8.0
+JUGADOR,AC Milan,165,Emerson Royal,26,Brasil,DEF,70,79,81,82,30.0
 
-EQUIPO,Borussia Dortmund,Alemania,140.0,Edin Terzić,41,Bosnia,OFENSIVO,6,4-2-3-1
-JUGADOR,Borussia Dortmund,166,Gregor Kobel,26,Alemania,POR,80,87,78,62,60.0
-JUGADOR,Borussia Dortmund,167,Mats Hummels,35,Alemania,DEF,62,86,82,70,35.0
-JUGADOR,Borussia Dortmund,168,Nico Schlotterbeck,24,Alemania,DEF,66,83,81,74,50.0
-JUGADOR,Borussia Dortmund,169,Niklas Süle,28,Alemania,DEF,65,84,82,72,45.0
-JUGADOR,Borussia Dortmund,170,Raphaël Guerreiro,30,Portugal,DEF,72,78,82,82,35.0
-JUGADOR,Borussia Dortmund,171,Julian Brandt,27,Alemania,MED,80,68,84,82,50.0
-JUGADOR,Borussia Dortmund,172,Emre Can,30,Alemania,MED,74,76,83,76,25.0
-JUGADOR,Borussia Dortmund,173,Marcel Sabitzer,30,Austria,MED,76,72,83,78,35.0
-JUGADOR,Borussia Dortmund,174,Karim Adeyemi,22,Alemania,DEL,84,50,83,90,60.0
-JUGADOR,Borussia Dortmund,175,Sébastien Haller,29,Costa de Marfil,DEL,80,52,82,78,25.0
-JUGADOR,Borussia Dortmund,176,Felix Nmecha,23,Alemania,MED,76,70,82,78,30.0
-JUGADOR,Borussia Dortmund,177,Giovanni Reyna,21,Estados Unidos,DEL,80,52,82,82,30.0
-JUGADOR,Borussia Dortmund,178,Jamie Gittens,19,Inglaterra,DEL,80,48,82,88,30.0
-JUGADOR,Borussia Dortmund,179,Donyell Malen,25,Países Bajos,DEL,82,48,82,88,40.0
-JUGADOR,Borussia Dortmund,180,Alexander Meyer,32,Alemania,POR,74,84,73,55,8.0
+EQUIPO,Borussia Dortmund,Alemania,145.0,Niko Kovač,53,Croacia,EQUILIBRADO,7,4-2-3-1
+JUGADOR,Borussia Dortmund,166,Gregor Kobel,27,Alemania,POR,81,88,79,63,65.0
+JUGADOR,Borussia Dortmund,167,Mats Hummels,36,Alemania,DEF,61,85,81,69,25.0
+JUGADOR,Borussia Dortmund,168,Nico Schlotterbeck,25,Alemania,DEF,67,84,82,75,55.0
+JUGADOR,Borussia Dortmund,169,Niklas Süle,29,Alemania,DEF,65,84,82,72,40.0
+JUGADOR,Borussia Dortmund,170,Ramy Bensebaini,29,Argelia,DEF,70,78,82,82,30.0
+JUGADOR,Borussia Dortmund,171,Julian Brandt,28,Alemania,MED,81,68,85,83,55.0
+JUGADOR,Borussia Dortmund,172,Emre Can,31,Alemania,MED,74,76,83,76,25.0
+JUGADOR,Borussia Dortmund,173,Marcel Sabitzer,31,Austria,MED,77,72,83,78,35.0
+JUGADOR,Borussia Dortmund,174,Karim Adeyemi,23,Alemania,DEL,85,50,84,91,65.0
+JUGADOR,Borussia Dortmund,175,Serhou Guirassy,29,Guinea,DEL,84,52,84,80,55.0
+JUGADOR,Borussia Dortmund,176,Felix Nmecha,24,Alemania,MED,77,70,83,79,35.0
+JUGADOR,Borussia Dortmund,177,Jamie Gittens,20,Inglaterra,DEL,82,48,83,90,45.0
+JUGADOR,Borussia Dortmund,178,Donyell Malen,26,Países Bajos,DEL,82,48,82,88,40.0
+JUGADOR,Borussia Dortmund,179,Pascal Groß,33,Alemania,MED,76,72,82,76,20.0
+JUGADOR,Borussia Dortmund,180,Alexander Meyer,33,Alemania,POR,74,84,73,55,8.0
 
-EQUIPO,Ajax,Países Bajos,120.0,John van 't Schip,61,Países Bajos,OFENSIVO,8,4-3-3
-JUGADOR,Ajax,181,Remko Pasveer,40,Países Bajos,POR,76,85,75,56,15.0
-JUGADOR,Ajax,182,Devyne Rensch,21,Países Bajos,DEF,70,78,78,82,20.0
-JUGADOR,Ajax,183,Jorrel Hato,17,Países Bajos,DEF,66,80,79,78,20.0
-JUGADOR,Ajax,184,Josip Šutalo,23,Croacia,DEF,65,82,80,74,20.0
-JUGADOR,Ajax,185,Owen Wijndal,24,Países Bajos,DEF,68,76,79,80,15.0
-JUGADOR,Ajax,186,Steven Berghuis,32,Países Bajos,MED,78,68,82,78,30.0
-JUGADOR,Ajax,187,Jordan Henderson,33,Inglaterra,MED,72,72,80,72,15.0
-JUGADOR,Ajax,188,Kenneth Taylor,21,Países Bajos,MED,76,68,81,78,25.0
-JUGADOR,Ajax,189,Mohammed Kudus,23,Ghana,DEL,84,50,83,86,50.0
-JUGADOR,Ajax,190,Brian Brobbey,21,Países Bajos,DEL,82,52,83,80,35.0
-JUGADOR,Ajax,191,Dušan Tadić,35,Serbia,DEL,78,60,80,76,20.0
-JUGADOR,Ajax,192,Chuba Akpom,28,Nigeria,DEL,78,50,81,78,20.0
-JUGADOR,Ajax,193,Francisco Conceição,21,Portugal,DEL,80,50,82,84,30.0
-JUGADOR,Ajax,194,Jay Gorter,23,Países Bajos,POR,72,82,72,54,10.0
-JUGADOR,Ajax,195,Branco van den Boomen,29,Países Bajos,MED,74,68,80,76,15.0
+EQUIPO,Ajax,Países Bajos,115.0,Francesco Farioli,35,Italia,DEFENSIVO,2,4-2-3-1
+JUGADOR,Ajax,181,Remko Pasveer,41,Países Bajos,POR,74,84,74,55,10.0
+JUGADOR,Ajax,182,Devyne Rensch,22,Países Bajos,DEF,71,79,79,83,25.0
+JUGADOR,Ajax,183,Jorrel Hato,18,Países Bajos,DEF,67,81,80,79,30.0
+JUGADOR,Ajax,184,Josip Šutalo,24,Croacia,DEF,66,83,81,75,25.0
+JUGADOR,Ajax,185,Borna Sosa,27,Croacia,DEF,70,76,80,82,20.0
+JUGADOR,Ajax,186,Steven Berghuis,33,Países Bajos,MED,77,68,81,77,25.0
+JUGADOR,Ajax,187,Kenneth Taylor,22,Países Bajos,MED,77,69,82,79,30.0
+JUGADOR,Ajax,188,Branco van den Boomen,30,Países Bajos,MED,75,68,80,76,15.0
+JUGADOR,Ajax,189,Chuba Akpom,29,Nigeria,DEL,79,50,81,78,20.0
+JUGADOR,Ajax,190,Brian Brobbey,22,Países Bajos,DEL,83,52,84,81,45.0
+JUGADOR,Ajax,191,Carlos Forbs,20,Dinamarca,DEL,80,48,81,86,25.0
+JUGADOR,Ajax,192,Kian Fitz-Jim,20,Países Bajos,MED,76,68,81,78,20.0
+JUGADOR,Ajax,193,Wout Weghorst,32,Países Bajos,DEL,77,52,80,74,15.0
+JUGADOR,Ajax,194,Jay Gorter,24,Países Bajos,POR,73,83,73,55,12.0
+JUGADOR,Ajax,195,Anton Gaaei,24,Dinamarca,DEF,70,78,80,83,18.0
 
-EQUIPO,Porto,Portugal,115.0,Sérgio Conceição,49,Portugal,DEFENSIVO,12,4-4-2
-JUGADOR,Porto,196,Diogo Costa,24,Portugal,POR,82,88,79,62,65.0
-JUGADOR,Porto,197,João Mário,31,Portugal,DEF,72,80,81,82,35.0
-JUGADOR,Porto,198,Pepe,41,Portugal,DEF,60,85,80,68,8.0
-JUGADOR,Porto,199,David Carmo,24,Portugal,DEF,64,82,79,73,25.0
-JUGADOR,Porto,200,Zaidu Sanusi,26,Nigeria,DEF,68,76,80,82,20.0
-JUGADOR,Porto,201,Fábio Vieira,23,Portugal,MED,80,68,83,80,40.0
-JUGADOR,Porto,202,Mateus Uribe,32,Colombia,MED,74,74,82,76,20.0
-JUGADOR,Porto,203,Evanilson,24,Brasil,DEL,82,50,83,82,50.0
-JUGADOR,Porto,204,Galeno,26,Brasil,DEL,82,50,83,86,45.0
-JUGADOR,Porto,205,Mehdi Taremi,31,Irán,DEL,82,54,83,78,40.0
-JUGADOR,Porto,206,Toni Martínez,27,España,DEL,78,50,80,76,15.0
-JUGADOR,Porto,207,Pepê,26,Brasil,DEL,80,50,82,84,30.0
-JUGADOR,Porto,208,Stephen Eustáquio,27,Canadá,MED,74,72,82,76,20.0
-JUGADOR,Porto,209,Cláudio Ramos,29,Portugal,POR,74,83,73,55,8.0
-JUGADOR,Porto,210,Iván Marcano,38,España,DEF,60,82,78,68,10.0
+EQUIPO,Porto,Portugal,120.0,Vítor Bruno,44,Portugal,DEFENSIVO,2,4-4-2
+JUGADOR,Porto,196,Diogo Costa,25,Portugal,POR,83,89,80,63,75.0
+JUGADOR,Porto,197,Martim Fernandes,20,Portugal,DEF,70,78,79,83,25.0
+JUGADOR,Porto,198,Nehuén Pérez,24,Argentina,DEF,65,83,80,74,30.0
+JUGADOR,Porto,199,David Carmo,25,Portugal,DEF,64,82,79,73,25.0
+JUGADOR,Porto,200,Zaidu Sanusi,27,Nigeria,DEF,68,76,80,82,20.0
+JUGADOR,Porto,201,Alan Varela,24,Argentina,MED,76,76,83,78,35.0
+JUGADOR,Porto,202,Iván Marcano,39,España,DEF,58,81,77,66,8.0
+JUGADOR,Porto,203,Evanilson,25,Brasil,DEL,83,50,83,83,55.0
+JUGADOR,Porto,204,Galeno,27,Brasil,DEL,83,50,84,87,50.0
+JUGADOR,Porto,205,Nico González,22,España,MED,78,68,82,80,35.0
+JUGADOR,Porto,206,Toni Martínez,28,España,DEL,78,50,80,76,15.0
+JUGADOR,Porto,207,Pepê,27,Brasil,DEL,80,50,82,85,30.0
+JUGADOR,Porto,208,Stephen Eustáquio,28,Canadá,MED,75,72,82,77,20.0
+JUGADOR,Porto,209,Cláudio Ramos,30,Portugal,POR,74,83,73,55,8.0
+JUGADOR,Porto,210,Danny Loader,24,Gales,DEL,76,48,80,80,12.0
 
-EQUIPO,Napoli,Italia,135.0,Walter Mazzarri,62,Italia,EQUILIBRADO,20,4-3-3
-JUGADOR,Napoli,211,Alex Meret,26,Italia,POR,80,87,78,60,45.0
-JUGADOR,Napoli,212,Giovanni Di Lorenzo,30,Italia,DEF,74,80,82,82,55.0
-JUGADOR,Napoli,213,Amir Rrahmani,30,Kosovo,DEF,65,83,81,73,40.0
-JUGADOR,Napoli,214,Min-jae Kim,27,Corea del Sur,DEF,67,84,83,76,60.0
-JUGADOR,Napoli,215,Mathías Olivera,26,Uruguay,DEF,70,78,80,82,35.0
-JUGADOR,Napoli,216,Piotr Zieliński,30,Polonia,MED,82,68,86,80,55.0
-JUGADOR,Napoli,217,André-Frank Zambo Anguissa,28,Camerún,MED,78,76,85,78,55.0
-JUGADOR,Napoli,218,Diego Demme,32,Alemania,MED,70,70,80,72,20.0
-JUGADOR,Napoli,219,Khvicha Kvaratskhelia,23,Georgia,DEL,88,50,86,88,100.0
-JUGADOR,Napoli,220,Victor Osimhen,25,Nigeria,DEL,90,52,87,88,120.0
-JUGADOR,Napoli,221,Giacomo Raspadori,24,Italia,DEL,80,56,82,78,45.0
-JUGADOR,Napoli,222,Matteo Politano,30,Italia,DEL,78,52,80,80,25.0
-JUGADOR,Napoli,223,Juan Jesus,32,Brasil,DEF,62,82,78,70,10.0
-JUGADOR,Napoli,224,Pierluigi Gollini,29,Italia,POR,74,83,73,55,10.0
-JUGADOR,Napoli,225,Elif Elmas,24,Macedonia,MED,76,68,81,78,25.0
+EQUIPO,Napoli,Italia,140.0,Antonio Conte,56,Italia,DEFENSIVO,14,3-4-3
+JUGADOR,Napoli,211,Alex Meret,27,Italia,POR,81,88,79,61,50.0
+JUGADOR,Napoli,212,Giovanni Di Lorenzo,31,Italia,DEF,75,81,83,82,60.0
+JUGADOR,Napoli,213,Amir Rrahmani,31,Kosovo,DEF,65,84,82,73,40.0
+JUGADOR,Napoli,214,Alessandro Buongiorno,25,Italia,DEF,67,85,83,76,60.0
+JUGADOR,Napoli,215,Mathías Olivera,27,Uruguay,DEF,71,79,81,83,40.0
+JUGADOR,Napoli,216,Scott McTominay,28,Escocia,MED,78,78,85,78,55.0
+JUGADOR,Napoli,217,André-Frank Zambo Anguissa,29,Camerún,MED,79,77,86,79,60.0
+JUGADOR,Napoli,218,Stanislav Lobotka,30,Eslovaquia,MED,76,74,85,76,50.0
+JUGADOR,Napoli,219,Khvicha Kvaratskhelia,24,Georgia,DEL,88,50,86,88,100.0
+JUGADOR,Napoli,220,Romelu Lukaku,32,Bélgica,DEL,85,54,84,78,50.0
+JUGADOR,Napoli,221,David Neres,28,Brasil,DEL,83,50,83,87,50.0
+JUGADOR,Napoli,222,Matteo Politano,31,Italia,DEL,78,52,80,80,25.0
+JUGADOR,Napoli,223,Juan Jesus,33,Brasil,DEF,61,82,77,70,8.0
+JUGADOR,Napoli,224,Elia Caprile,23,Italia,POR,75,84,74,56,15.0
+JUGADOR,Napoli,225,Billy Gilmour,21,Escocia,MED,75,70,82,78,25.0
 
-EQUIPO,Benfica,Portugal,110.0,Roger Schmidt,56,Alemania,OFENSIVO,10,4-2-3-1
-JUGADOR,Benfica,226,Odysseas Vlachodimos,29,Grecia,POR,80,86,77,60,40.0
-JUGADOR,Benfica,227,Alexander Bah,27,Dinamarca,DEF,70,78,80,82,30.0
-JUGADOR,Benfica,228,António Silva,20,Portugal,DEF,66,82,81,74,45.0
-JUGADOR,Benfica,229,Nicolás Otamendi,36,Argentina,DEF,62,84,80,70,25.0
-JUGADOR,Benfica,230,Grimaldo,28,España,DEF,74,78,82,84,50.0
-JUGADOR,Benfica,231,João Neves,19,Portugal,MED,80,72,84,80,70.0
-JUGADOR,Benfica,232,Fredrik Aursnes,28,Noruega,MED,74,73,82,78,30.0
-JUGADOR,Benfica,233,Florentino Luís,24,Portugal,MED,72,76,82,74,30.0
-JUGADOR,Benfica,234,Rafa Silva,31,Portugal,DEL,82,54,83,84,45.0
-JUGADOR,Benfica,235,Gonçalo Ramos,22,Portugal,DEL,82,52,84,80,65.0
-JUGADOR,Benfica,236,Petar Musa,25,Croacia,DEL,80,52,82,78,25.0
-JUGADOR,Benfica,237,Ángel Di María,35,Argentina,DEL,80,54,80,82,20.0
-JUGADOR,Benfica,238,David Neres,27,Brasil,DEL,82,50,82,86,40.0
-JUGADOR,Benfica,239,Henrique Araújo,22,Portugal,DEL,78,50,80,78,15.0
-JUGADOR,Benfica,240,Samuel Soares,22,Portugal,POR,72,82,72,54,8.0
+EQUIPO,Benfica,Portugal,115.0,Bruno Lage,48,Portugal,OFENSIVO,6,4-2-3-1
+JUGADOR,Benfica,226,Anatoliy Trubin,23,Ucrania,POR,81,87,78,62,45.0
+JUGADOR,Benfica,227,Alexander Bah,28,Dinamarca,DEF,71,79,81,83,30.0
+JUGADOR,Benfica,228,António Silva,21,Portugal,DEF,68,84,82,75,55.0
+JUGADOR,Benfica,229,Nicolás Otamendi,37,Argentina,DEF,61,84,80,69,20.0
+JUGADOR,Benfica,230,Álvaro Carreras,22,España,DEF,71,79,82,84,40.0
+JUGADOR,Benfica,231,João Neves,20,Portugal,MED,81,72,85,81,80.0
+JUGADOR,Benfica,232,Fredrik Aursnes,29,Noruega,MED,74,73,82,78,30.0
+JUGADOR,Benfica,233,Florentino Luís,25,Portugal,MED,73,77,83,75,35.0
+JUGADOR,Benfica,234,Rafa Silva,32,Portugal,DEL,81,54,82,83,35.0
+JUGADOR,Benfica,235,Orkun Kökcü,24,Países Bajos,MED,80,70,84,79,50.0
+JUGADOR,Benfica,236,Petar Musa,26,Croacia,DEL,81,52,82,79,30.0
+JUGADOR,Benfica,237,Angel Di María,36,Argentina,DEL,78,54,79,80,15.0
+JUGADOR,Benfica,238,David Neres,28,Brasil,DEL,83,50,83,87,45.0
+JUGADOR,Benfica,239,Andreas Schjelderup,21,Noruega,DEL,79,50,81,80,25.0
+JUGADOR,Benfica,240,Samuel Soares,23,Portugal,POR,73,83,73,55,10.0
