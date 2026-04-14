@@ -4,6 +4,7 @@ import model.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -148,7 +149,13 @@ public class PanelPartido extends JPanel {
 
         btnSiguiente.addActionListener(e -> simularBloque());
         btnPenaltis.addActionListener(e  -> simularPenaltis());
-        btnVolver.addActionListener(e    -> volverAlTorneo());
+        btnVolver.addActionListener(e    -> {
+            try {
+                volverAlTorneo();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         btnCerrar.addActionListener(e    -> System.exit(0));
 
         panelBotones.add(btnSiguiente);
@@ -400,7 +407,7 @@ public class PanelPartido extends JPanel {
     }
 
 
-    private void volverAlTorneo() {
+    private void volverAlTorneo() throws IOException {
         frame.mostrarPantalla(MainFrame.PANTALLA_TORNEO);
     }
 

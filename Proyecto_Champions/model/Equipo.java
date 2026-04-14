@@ -117,33 +117,108 @@ public class Equipo {
      * Distribuye jugadores por posición respetando el esquema táctico.
      */
     public void establecerMejorOnce() {
+        // Resetear todos los jugadores
+        for (Jugador j : plantilla) {
+            j.setTitular(false);
+            j.setXField(-1);
+            j.setYField(-1);
+        }
         titulares.clear();
+
         int[] cuotas = parseFormacion(formacion); // [POR, DEF, MED, DEL]
-        String[] categorias = {"POR", "DEF", "MED", "DEL"};
+        
+        // 1. Portero
+        buscarYAgregarMejor(1, "POR");
 
-        for (int p = 0; p < categorias.length; p++) {
-            int cuota   = cuotas[p];
-            int puestos = 0;
-            String cat  = categorias[p];
+        // 2. Defensas
+        int numDef = cuotas[1];
+        if (numDef >= 4) {
+            buscarYAgregarMejor(1, "LI");
+            buscarYAgregarMejor(1, "LD");
+            buscarYAgregarMejor(numDef - 2, "DFC");
+        } else {
+            buscarYAgregarMejor(numDef, "DFC");
+        }
 
-            while (puestos < cuota) {
-                Jugador mejorNoUsado = null;
-                Iterator<Jugador> it = plantilla.iterator();
-                while (it.hasNext()) {
-                    Jugador j = it.next();
-                    if (perteneceACategoria(j.getPosicion(), cat) && !titulares.contains(j)) {
-                        if (mejorNoUsado == null || j.getMediaGeneral() > mejorNoUsado.getMediaGeneral()) {
-                            mejorNoUsado = j;
+        // 3. Medios
+        int numMed = cuotas[2];
+        if (numMed >= 3) {
+            buscarYAgregarMejor(1, "MI");
+            buscarYAgregarMejor(1, "MD");
+            buscarYAgregarMejor(numMed - 2, "MC");
+        } else {
+            buscarYAgregarMejor(numMed, "MC");
+        }
+
+        // 4. Delanteros
+        int numDel = cuotas[3];
+        if (numDel >= 2) {
+            buscarYAgregarMejor(1, "EI");
+            buscarYAgregarMejor(1, "ED");
+            buscarYAgregarMejor(numDel - 2, "DC");
+        } else {
+            buscarYAgregarMejor(numDel, "DC");
+        }
+        
+        // Si no se han llenado los 11 (por falta de jugadores en posiciones específicas),
+        // rellenar con los mejores disponibles de cualquier posición.
+        while (titulares.size() < 11) {
+            Jugador mejor = null;
+            for (Jugador j : plantilla) {
+                if (!titulares.contains(j)) {
+                    if (mejor == null || j.getMediaGeneral() > mejor.getMediaGeneral()) {
+                        mejor = j;
+                    }
+                }
+            }
+            if (mejor != null) {
+                mejor.setTitular(true);
+                titulares.add(mejor);
+            } else break;
+        }
+    }
+
+    private void buscarYAgregarMejor(int cantidad, String posDeseada) {
+        String categoria = obtenerCategoria(posDeseada);
+        for (int i = 0; i < cantidad; i++) {
+            Jugador mejor = null;
+            for (Jugador j : plantilla) {
+                if (titulares.contains(j)) continue;
+                
+                // Prioridad 1: Posición exacta
+                // Prioridad 2: Misma categoría (DEF, MED, DEL)
+                boolean mismaPos = j.getPosicion().equals(posDeseada);
+                boolean mismaCat = perteneceACategoria(j.getPosicion(), categoria);
+
+                if (mismaPos || mismaCat) {
+                    if (mejor == null) {
+                        mejor = j;
+                    } else {
+                        // Si j tiene la posición exacta y el mejor no, gana j
+                        boolean mejorMismaPos = mejor.getPosicion().equals(posDeseada);
+                        if (mismaPos && !mejorMismaPos) {
+                            mejor = j;
+                        } else if (mismaPos == mejorMismaPos) {
+                            if (j.getMediaGeneral() > mejor.getMediaGeneral()) {
+                                mejor = j;
+                            }
                         }
                     }
                 }
-                if (mejorNoUsado != null) {
-                    mejorNoUsado.setTitular(true);
-                    titulares.add(mejorNoUsado);
-                    puestos++;
-                } else break;
+            }
+            if (mejor != null) {
+                mejor.setTitular(true);
+                titulares.add(mejor);
             }
         }
+    }
+
+    private String obtenerCategoria(String pos) {
+        if (pos.matches("POR")) return "POR";
+        if (pos.matches("DEF|LD|LI|DFC|CAD|CAI")) return "DEF";
+        if (pos.matches("MED|MC|MCD|MCO|MI|MD")) return "MED";
+        if (pos.matches("DEL|DC|ED|EI|SD")) return "DEL";
+        return "OTRO";
     }
 
     private boolean perteneceACategoria(String pos, String cat) {
