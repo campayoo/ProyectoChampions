@@ -67,56 +67,60 @@ Proyecto_Champions/
 │   └── MercadoFichajes.java
 │
 └── Main.java           # Punto de entrada
-
-## ⚙️ 6. Funcionalidades
-
-* **🧍 Jugadores:** Creación de perfiles con atributos personalizados y sistema de transferencias.
-* **🏟️ Equipos:** Plantillas completas, gestión de presupuesto y entrenadores asociados.
-* **💰 Mercado:** Sistema dinámico de compra/venta con validación automática de presupuesto.
-* **⚽ Partidos:** Simulación automática con resultados dinámicos basados en estadísticas de los equipos.
-* **🏆 Torneos:** Sistema de eliminatorias con rondas automáticas hasta alcanzar el campeón final.
-
----
-
-## 🔌 7. Interfaces clave
-
-### `Simulable`
-```java
+⚙️ 6. Funcionalidades
+🧍 Jugadores: Creación de perfiles con atributos personalizados y sistema de transferencias.
+🏟️ Equipos: Plantillas completas, gestión de presupuesto y entrenadores asociados.
+💰 Mercado: Sistema dinámico de compra/venta con validación automática de presupuesto.
+⚽ Partidos: Simulación automática con resultados dinámicos basados en estadísticas de los equipos.
+🏆 Torneos: Sistema de eliminatorias con rondas automáticas hasta alcanzar el campeón final.
+🔌 7. Interfaces clave
+Simulable
+Java
+
 public interface Simulable {
     void simular();
 }
-
 Transferible
+Java
+
 public interface Transferible {
     void transferir(Equipo destino);
 }
-## 🔄 8. Flujo del sistema
+🔄 8. Flujo del sistema
+Text
+
 Inicio
- ↓
+  ↓
 Carga de datos (CSV)
- ↓
+  ↓
 Gestión de equipos/jugadores
- ↓
+  ↓
 Mercado de fichajes
- ↓
+  ↓
 Simulación de partidos
- ↓
+  ↓
 Torneo
- ↓
+  ↓
 Resultado final
-## 🚀 9. Instalación y ejecución
-### 1. Clonar repositorio
+🚀 9. Instalación y ejecución
+1. Clonar repositorio
+Bash
+
 git clone https://github.com/tu-usuario/proyecto-champions.git
-### 2. Requisitos
+2. Requisitos
 Java 17+
 IntelliJ / Eclipse
-### 3. Ejecutar
-Main.java
-## 🧪 10. Tests y cobertura
+3. Ejecutar
+Bash
+
+java Main.java
+🧪 10. Tests y cobertura
 Tecnologías
 JUnit 5
 Mockito (opcional)
 Ejemplo de test
+Java
+
 @Test
 void testSimulacionPartido() {
     Partido partido = new Partido(equipo1, equipo2);
@@ -124,41 +128,38 @@ void testSimulacionPartido() {
     assertNotNull(partido.getResultado());
 }
 Cobertura
+💡 Puedes generarlo con IntelliJ o JaCoCo.
 
-💡 Puedes generarlo con IntelliJ o JaCoCo
+📊 11. Datos iniciales
+El archivo data/equipos.csv permite inicializar equipos automáticamente.
 
-## 📊 11. Datos iniciales
-data/equipos.csv
-
-Permite inicializar equipos automáticamente.
-
-##💡 12. Mejoras futuras
-Base de datos (MySQL)
-API REST (Spring Boot)
-IA para decisiones de juego
-Modo carrera
-Multiplayer
-Migración a JavaFX
-## 👨‍💻 13. Autor
-
+💡 12. Mejoras futuras
+ Base de datos (MySQL)
+ API REST (Spring Boot)
+ IA para decisiones de juego
+ Modo carrera
+ Multiplayer
+ Migración a JavaFX
+👨‍💻 13. Autor
 Pablo
-
 Proyecto académico avanzado orientado a simulación deportiva y arquitectura software.
 
-##📄 14. Licencia
-
+📄 14. Licencia
 Uso educativo. Libre para modificar.
 
-## ⭐ 15. Contribuir
-Fork 🍴
-Branch 🚀
-Commit
-Pull Request
-## 🏁 16. Conclusión
-
+⭐ 15. Contribuir
+Haz un Fork 🍴
+Crea tu Branch 🚀 (git checkout -b feature/NuevaCaracteristica)
+Haz Commit (git commit -m 'Añadir nueva característica')
+Abre un Pull Request
+🏁 16. Conclusión
 Este proyecto representa una implementación completa de:
 
-✔ Arquitectura limpia
-✔ Simulación realista
-✔ Interfaz gráfica funcional
-✔ Buenas prácticas de desarrollo
+✔️ Arquitectura limpia
+✔️ Simulación realista
+✔️ Interfaz gráfica funcional
+✔️ Buenas prácticas de desarrollo
+PlainText
+
+
+¡Espero que te sea de mucha utilidad para destacar tu proyecto! Si necesitas ayuda redactando alguna otra parte o puliendo algún texto, estaré encantado de ayudarte. ¡Mucho éxito con *Proyecto Champions*!
