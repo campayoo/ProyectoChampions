@@ -3,12 +3,16 @@ package gui;
 import model.Jugador;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * PanelCampo — representa visualmente el campo de fútbol con los jugadores (estilo FIFA).
+ * Ahora soporta arrastrar y soltar para posicionar a los jugadores libremente.
  */
 public class PanelCampo extends JPanel {
     private final Color VERDE_CESPED = new Color(34, 139, 34);
@@ -17,6 +21,7 @@ public class PanelCampo extends JPanel {
     private List<Jugador> titulares;
     private Map<String, Point> posicionesCoordenadas = new HashMap<>();
     private Jugador seleccionado;
+    private Jugador arrastrando;
     private SelectionListener selectionListener;
 
     public interface SelectionListener {
@@ -28,6 +33,49 @@ public class PanelCampo extends JPanel {
         this.selectionListener = listener;
         setBackground(VERDE_CESPED);
         initCoordenadas();
+        configurarEventos();
+    }
+
+    private void configurarEventos() {
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Jugador j = getJugadorEn(e.getX(), e.getY());
+                if (j != null) {
+                    arrastrando = j;
+                    setSeleccionado(j);
+                    if (selectionListener != null) selectionListener.onPlayerSelected(j);
+                } else {
+                    setSeleccionado(null);
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                arrastrando = null;
+            }
+        });
+
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (arrastrando != null) {
+                    int w = getWidth();
+                    int h = getHeight();
+                    // Convertir clicks a coordenadas relativas 0-100
+                    int relX = (int) (e.getX() * 100.0 / w);
+                    int relY = (int) (e.getY() * 100.0 / h);
+                    
+                    // Limitar a los bordes del campo
+                    relX = Math.max(5, Math.min(95, relX));
+                    relY = Math.max(5, Math.min(95, relY));
+
+                    arrastrando.setXField(relX);
+                    arrastrando.setYField(relY);
+                    repaint();
+                }
+            }
+        });
     }
 
     public void setTitulares(List<Jugador> titulares) {
@@ -56,9 +104,9 @@ public class PanelCampo extends JPanel {
         // Medios
         posicionesCoordenadas.put("MC",  new Point(50, 45));
         posicionesCoordenadas.put("MCI", new Point(30, 45));
-        posicionesCoordenadas.put("MCR", new Point(70, 45)); // Antes MCD
+        posicionesCoordenadas.put("MCR", new Point(70, 45)); 
         posicionesCoordenadas.put("MCO", new Point(50, 35));
-        posicionesCoordenadas.put("MCD", new Point(50, 58)); // Mediocentro Defensivo (atrasado)
+        posicionesCoordenadas.put("MCD", new Point(50, 58)); 
         posicionesCoordenadas.put("MD",  new Point(85, 45));
         posicionesCoordenadas.put("MI",  new Point(15, 45));
         posicionesCoordenadas.put("MED", new Point(50, 45)); // fallback
@@ -99,13 +147,19 @@ public class PanelCampo extends JPanel {
         Map<String, Integer> usados = new HashMap<>();
 
         for (Jugador j : titulares) {
-            String pos = j.getPosicion();
-            int offset = usados.getOrDefault(pos, 0);
-            usados.put(pos, offset + 1);
+            int x, y;
+            if (j.getXField() != -1 && j.getYField() != -1) {
+                x = (int) (j.getXField() * w / 100.0);
+                y = (int) (j.getYField() * h / 100.0);
+            } else {
+                String pos = j.getPosicion();
+                int offset = usados.getOrDefault(pos, 0);
+                usados.put(pos, offset + 1);
 
-            Point pRel = getCoordenadaEspecial(pos, offset);
-            int x = (int) (pRel.x * w / 100.0);
-            int y = (int) (pRel.y * h / 100.0);
+                Point pRel = getCoordenadaEspecial(pos, offset);
+                x = (int) (pRel.x * w / 100.0);
+                y = (int) (pRel.y * h / 100.0);
+            }
 
             dibujarJugador(g2, x, y, j);
         }
@@ -160,24 +214,27 @@ public class PanelCampo extends JPanel {
         
         g2.setColor(Color.WHITE);
         g2.drawString(txt, x - fm.stringWidth(txt) / 2, y + 33);
-        
-        // Área clicable invisible (simplificada: el paint solo dibuja)
     }
 
-    // El manejo de clicks se hará desde PanelAlineacion usando las coordenadas calculadas
     public Jugador getJugadorEn(int mouseX, int mouseY) {
         int w = getWidth();
         int h = getHeight();
         Map<String, Integer> usados = new HashMap<>();
         
         for (Jugador j : titulares) {
-            String pos = j.getPosicion();
-            int offset = usados.getOrDefault(pos, 0);
-            usados.put(pos, offset + 1);
+            int x, y;
+            if (j.getXField() != -1 && j.getYField() != -1) {
+                x = (int) (j.getXField() * w / 100.0);
+                y = (int) (j.getYField() * h / 100.0);
+            } else {
+                String pos = j.getPosicion();
+                int offset = usados.getOrDefault(pos, 0);
+                usados.put(pos, offset + 1);
 
-            Point pRel = getCoordenadaEspecial(pos, offset);
-            int x = (int) (pRel.x * w / 100.0);
-            int y = (int) (pRel.y * h / 100.0);
+                Point pRel = getCoordenadaEspecial(pos, offset);
+                x = (int) (pRel.x * w / 100.0);
+                y = (int) (pRel.y * h / 100.0);
+            }
 
             if (Math.hypot(mouseX - x, mouseY - y) < 25) {
                 return j;

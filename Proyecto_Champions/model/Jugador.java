@@ -29,6 +29,8 @@ public class Jugador extends Persona implements Transferible, Comparable<Jugador
     private int asistencias;
     private int tarjetasAmarillas;
     private boolean titular;      // si está en el once inicial
+    private int     xField = -1;  // Posición X manual en el campo (0-100)
+    private int     yField = -1;  // Posición Y manual en el campo (0-100)
 
     // ─────────────────────────────────────────────────────────────────────
     public Jugador(int id, String nombre, int edad, String nacionalidad,
@@ -120,6 +122,11 @@ public class Jugador extends Persona implements Transferible, Comparable<Jugador
     public int     getVelocidad()          { return velocidad; }
     public boolean isTitular()             { return titular; }
     public void    setTitular(boolean t)   { this.titular = t; }
+
+    public int  getXField() { return xField; }
+    public void setXField(int x) { this.xField = x; }
+    public int  getYField() { return yField; }
+    public void setYField(int y) { this.yField = y; }
 
     @Override
     public String toString() {

@@ -4,6 +4,7 @@ import model.*;
 import data.LectorDatos;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -39,7 +40,7 @@ public class MainFrame extends JFrame {
     private final JLabel lblRonda;
 
     // ─────────────────────────────────────────────────────────────────────
-    public MainFrame() {
+    public MainFrame() throws IOException {
         super("⚽ Champions League Manager");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1100, 750);
@@ -78,7 +79,7 @@ public class MainFrame extends JFrame {
 
     // ── Navegación ────────────────────────────────────────────────────────
 
-    public void mostrarPantalla(String nombre) {
+    public void mostrarPantalla(String nombre) throws IOException {
         switch (nombre) {
             case PANTALLA_BIENVENIDA -> {
                 PanelBienvenida pb = new PanelBienvenida(this);
@@ -111,9 +112,9 @@ public class MainFrame extends JFrame {
 
     // ── Inicialización del torneo ─────────────────────────────────────────
 
-    public void iniciarTorneo(Equipo equipoUsuario) {
+    public void iniciarTorneo(Equipo equipoUsuario) throws IOException {
         torneo = new Torneo("UEFA Champions League 2024/25");
-        ArrayList<Equipo> equipos = LectorDatos.generarDatosDefecto();
+        ArrayList<Equipo> equipos = LectorDatos.cargarEquipos();
         for (Equipo e : equipos) torneo.agregarEquipo(e);
 
         // Asegurar que el equipo elegido esté en el torneo
@@ -140,7 +141,7 @@ public class MainFrame extends JFrame {
      * Simula todos los partidos de la ronda actuales (menos el del usuario)
      * y avanza al siguiente turno.
      */
-    public void simularRondaIA() {
+    public void simularRondaIA() throws IOException {
         ArrayList<Equipo> clasificados = new ArrayList<>();
 
         for (Eliminatoria elim : torneo.getEliminatorias()) {

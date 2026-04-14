@@ -4,6 +4,7 @@ import model.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -75,8 +76,20 @@ public class PanelTorneo extends JPanel {
         JButton btnAlineacion = boton("📋  Mi Alineación", new Color(0, 50, 80), UCL_BLUE);
         JButton btnMercado = boton("💶  Mercado de fichajes", new Color(60, 40, 10), UCL_GOLD);
 
-        btnJugar.addActionListener(e -> jugarPartidoUsuario());
-        btnSimular.addActionListener(e -> simularRondaIA());
+        btnJugar.addActionListener(e -> {
+            try {
+                jugarPartidoUsuario();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        btnSimular.addActionListener(e -> {
+            try {
+                simularRondaIA();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         btnAlineacion.addActionListener(e -> {
             // Buscar si hay una eliminatoria pendiente para el usuario
             Equipo usr = frame.getTorneo().getEquipoUsuario();
@@ -86,9 +99,19 @@ public class PanelTorneo extends JPanel {
                     break;
                 }
             }
-            frame.mostrarPantalla(MainFrame.PANTALLA_ALINEACION);
+            try {
+                frame.mostrarPantalla(MainFrame.PANTALLA_ALINEACION);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         });
-        btnMercado.addActionListener(e -> frame.mostrarPantalla(MainFrame.PANTALLA_MERCADO));
+        btnMercado.addActionListener(e -> {
+            try {
+                frame.mostrarPantalla(MainFrame.PANTALLA_MERCADO);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         boolean terminado = t.isTerminado();
         btnJugar.setEnabled(!terminado);
@@ -314,7 +337,7 @@ public class PanelTorneo extends JPanel {
 
     // ── Acciones ──────────────────────────────────────────────────────────
 
-    private void jugarPartidoUsuario() {
+    private void jugarPartidoUsuario() throws IOException {
         Equipo usr = frame.getTorneo().getEquipoUsuario();
         Eliminatoria elim = null;
         if (frame.getTorneo().isTerminado()) {
@@ -338,7 +361,7 @@ public class PanelTorneo extends JPanel {
         frame.mostrarPantalla(MainFrame.PANTALLA_ALINEACION);
     }
 
-    private void simularRondaIA() {
+    private void simularRondaIA() throws IOException {
         if (frame.getTorneo().isTerminado()) {
             JOptionPane.showMessageDialog(this, "El torneo ha finalizado.");
             return;

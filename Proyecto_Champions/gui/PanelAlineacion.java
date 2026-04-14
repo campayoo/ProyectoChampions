@@ -4,6 +4,7 @@ import model.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
+import java.io.IOException;
 
 /**
  * PanelAlineacion — permite al usuario gestionar la formación, el estilo de juego
@@ -98,30 +99,25 @@ public class PanelAlineacion extends JPanel {
         colIzq.add(scrollConTitulo(listSuplentes, " 🪑 Banquillo (Suplentes) "));
 
         // --- Panel Derecha: Campo FIFA ---
-        panelCampo = new PanelCampo(equipo.getTitulares(), null);
-        panelCampo.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mousePressed(java.awt.event.MouseEvent e) {
-                Jugador tit = panelCampo.getJugadorEn(e.getX(), e.getY());
-                if (tit != null) {
-                    if (seleccionadoBanquillo != null) {
-                        // Realizar cambio
-                        if (equipo.realizarCambio(tit, seleccionadoBanquillo)) {
-                            seleccionadoBanquillo = null;
-                            listSuplentes.clearSelection();
-                            actualizarVistas();
-                            frame.setEstado("🔄 Cambio realizado: " + tit.getNombre() + " sale del campo.");
-                        } else {
-                            JOptionPane.showMessageDialog(null, "No se pudo realizar el cambio.");
-                        }
+        panelCampo = new PanelCampo(equipo.getTitulares(), j -> {
+            if (j != null) {
+                if (seleccionadoBanquillo != null) {
+                    // Realizar cambio
+                    if (equipo.realizarCambio(j, seleccionadoBanquillo)) {
+                        seleccionadoBanquillo = null;
+                        listSuplentes.clearSelection();
+                        actualizarVistas();
+                        frame.setEstado("🔄 Cambio realizado: " + j.getNombre() + " sale del campo.");
                     } else {
-                        // Solo seleccionar visualmente
-                        panelCampo.setSeleccionado(tit);
-                        frame.setEstado("Titular: " + tit.getNombre() + " (" + tit.getPosicion() + ") | Med: " + tit.getMediaGeneral());
+                        JOptionPane.showMessageDialog(null, "No se pudo realizar el cambio.");
                     }
                 } else {
-                     panelCampo.setSeleccionado(null);
+                    // Solo seleccionar visualmente
+                    panelCampo.setSeleccionado(j);
+                    frame.setEstado("Titular: " + j.getNombre() + " (" + j.getPosicion() + ") | Med: " + j.getMediaGeneral());
                 }
+            } else {
+                panelCampo.setSeleccionado(null);
             }
         });
 
@@ -137,7 +133,13 @@ public class PanelAlineacion extends JPanel {
         JButton btnJugar  = boton("⚽ Confirmar y Jugar", VERDE, BLANCO);
         btnJugar.setFont(new Font("SansSerif", Font.BOLD, 16));
 
-        btnVolver.addActionListener(e -> frame.mostrarPantalla(MainFrame.PANTALLA_TORNEO));
+        btnVolver.addActionListener(e -> {
+            try {
+                frame.mostrarPantalla(MainFrame.PANTALLA_TORNEO);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         btnJugar.addActionListener(e -> {
             if (frame.getEliminatoriaActual() == null) {
                 JOptionPane.showMessageDialog(this, "No hay ningún partido pendiente.");
@@ -145,7 +147,11 @@ public class PanelAlineacion extends JPanel {
             }
             equipo.setFormacion(cmbFormacion.getSelectedItem().toString());
             equipo.setTactica(cmbTactica.getSelectedItem().toString());
-            frame.mostrarPantalla(MainFrame.PANTALLA_PARTIDO);
+            try {
+                frame.mostrarPantalla(MainFrame.PANTALLA_PARTIDO);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
         sur.add(btnVolver);

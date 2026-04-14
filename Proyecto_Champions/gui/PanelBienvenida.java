@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -27,14 +28,14 @@ public class PanelBienvenida extends JPanel {
     private static final Color TXT_GRAY  = new Color(160, 175, 210);
 
     // ─────────────────────────────────────────────────────────────────────
-    public PanelBienvenida(MainFrame frame) {
+    public PanelBienvenida(MainFrame frame) throws IOException {
         this.frame = frame;
         setBackground(BG_DARK);
         setLayout(new BorderLayout(0, 0));
         construirUI();
     }
 
-    private void construirUI() {
+    private void construirUI() throws IOException {
         // ── Cabecera ──────────────────────────────────────────────────────
         JPanel header = new JPanel(new GridBagLayout());
         header.setBackground(BG_DARK);
@@ -60,7 +61,7 @@ public class PanelBienvenida extends JPanel {
         header.add(estrella, gbc);
 
         // ── Centro: lista de equipos ──────────────────────────────────────
-        equipos = LectorDatos.generarDatosDefecto();
+        equipos = LectorDatos.cargarEquipos();
         DefaultListModel<String> modelo = new DefaultListModel<>();
         for (Equipo e : equipos) {
             modelo.addElement(String.format("%-30s  ·  %s  ·  💶 %.0fM€",
@@ -80,7 +81,13 @@ public class PanelBienvenida extends JPanel {
         // Doble click para seleccionar
         listaEquipos.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) iniciarJuego();
+                if (e.getClickCount() == 2) {
+                    try {
+                        iniciarJuego();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
             }
         });
 
@@ -132,7 +139,13 @@ public class PanelBienvenida extends JPanel {
 
         // ── Botones ───────────────────────────────────────────────────────
         JButton btnIniciar = crearBoton("⚽  INICIAR TORNEO", UCL_BLUE, Color.WHITE);
-        btnIniciar.addActionListener(e -> iniciarJuego());
+        btnIniciar.addActionListener(e -> {
+            try {
+                iniciarJuego();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         JButton btnSalir = crearBoton("✕  Salir", new Color(80, 20, 20), new Color(255, 180, 180));
         btnSalir.addActionListener(e -> System.exit(0));
@@ -176,7 +189,7 @@ public class PanelBienvenida extends JPanel {
         return sb.toString();
     }
 
-    private void iniciarJuego() {
+    private void iniciarJuego() throws IOException {
         int idx = listaEquipos.getSelectedIndex();
         if (idx < 0) { JOptionPane.showMessageDialog(this, "Selecciona un equipo."); return; }
         Equipo elegido = equipos.get(idx);

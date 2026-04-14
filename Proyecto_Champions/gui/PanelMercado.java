@@ -4,6 +4,7 @@ import model.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -138,7 +139,13 @@ public class PanelMercado extends JPanel {
 
         btnFichar.addActionListener(e -> ficharSeleccionado());
         btnVender.addActionListener(e -> venderJugadorUsuario());
-        btnVolver.addActionListener(e -> frame.mostrarPantalla(MainFrame.PANTALLA_TORNEO));
+        btnVolver.addActionListener(e -> {
+            try {
+                frame.mostrarPantalla(MainFrame.PANTALLA_TORNEO);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         panelBotones.add(btnFichar);
         panelBotones.add(btnVender);
