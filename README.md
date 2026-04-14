@@ -67,12 +67,16 @@ Proyecto_Champions/
 │   └── MercadoFichajes.java
 │
 └── Main.java           # Punto de entrada
+
+---
 ⚙️ 6. Funcionalidades
 🧍 Jugadores: Creación de perfiles con atributos personalizados y sistema de transferencias.
 🏟️ Equipos: Plantillas completas, gestión de presupuesto y entrenadores asociados.
 💰 Mercado: Sistema dinámico de compra/venta con validación automática de presupuesto.
 ⚽ Partidos: Simulación automática con resultados dinámicos basados en estadísticas de los equipos.
 🏆 Torneos: Sistema de eliminatorias con rondas automáticas hasta alcanzar el campeón final.
+
+---
 🔌 7. Interfaces clave
 Simulable
 Java
@@ -86,6 +90,7 @@ Java
 public interface Transferible {
     void transferir(Equipo destino);
 }
+---
 🔄 8. Flujo del sistema
 Text
 
