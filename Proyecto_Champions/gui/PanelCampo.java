@@ -1,124 +1,210 @@
 package gui;
 
 import model.Jugador;
+import model.Jugador.Compatibilidad;
+import model.Equipo;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.util.HashMap;
+import java.awt.event.*;
+import java.awt.geom.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
- * PanelCampo — representa visualmente el campo de fútbol con los jugadores (estilo FIFA).
- * Ahora soporta arrastrar y soltar para posicionar a los jugadores libremente.
+ * Clase PanelCampo: Lienzo interactivo del terreno de juego.
+ * 
+ * Este componente es el centro neurálgico la gestión táctica. Permite:
+ * - Visualizar la disposición de los jugadores en el césped.
+ * - Gestionar cambios y posiciones mediante Drag & Drop (Arrastrar y Soltar).
+ * - Obtener feedback inmediato del OVR real según la posición ocupada.
+ * - Ver animaciones tácticas y efectos visuales de alta fidelidad.
  */
 public class PanelCampo extends JPanel {
-    private final Color VERDE_CESPED = new Color(34, 139, 34);
-    private final Color LINEAS_CAMPO = new Color(255, 255, 255, 180);
+
+    // --- BLOQUE: PALETA DE COLORES TÁCTICA ---
+    private static final Color BG_FIELD_TOP    = new Color(5,  10,  35);
+    private static final Color BG_FIELD_BTM    = new Color(8,  30,  65);
+    private static final Color CESPED_1        = new Color(26, 84,  50);
+    private static final Color CESPED_2        = new Color(22, 72,  44);
+    private static final Color LINEAS_CAMPO    = new Color(255, 255, 255, 70);
+    private static final Color UCL_GOLD        = new Color(255, 210, 0);
+    private static final Color OVR_NATURAL     = new Color(0,   230, 100);
+    private static final Color OVR_AFIN        = new Color(255, 160, 30);
+    private static final Color OVR_OPUESTA     = new Color(255, 30,  50);
+
+    // --- BLOQUE: ESTADO INTERNO Y GESTIÓN DE NODOS ---
+    private Equipo                equipo;
+    private List<Jugador>         titulares;
+    private List<Jugador>         suplentes;
+    private List<NodoPosicion>    nodos = new ArrayList<>();
     
-    private List<Jugador> titulares;
-    private Map<String, Point> posicionesCoordenadas = new HashMap<>();
-    private Jugador seleccionado;
-    private Jugador arrastrando;
-    private SelectionListener selectionListener;
+    private Jugador               seleccionado;
+    private Jugador               arrastrando;
+    private Point                 dragPoint;
+    private NodoPosicion          nodoResaltado;
+    private SelectionListener     selectionListener;
+    private String                formacion;
 
-    public interface SelectionListener {
-        void onPlayerSelected(Jugador j);
+    /**
+     * NodoPosicion: Define un slot táctico o 'hueco' en el campo.
+     */
+    public static class NodoPosicion {
+        public final String etiqueta;      // Nombre del rol (ej: 'MCD')
+        public final int relX, relY;       // Ubicación relativa (0-100)
+        public Jugador jugadorAsignado;    // Activo que ocupa el slot
+
+        public NodoPosicion(String etiqueta, int relX, int relY) {
+            this.etiqueta = etiqueta;
+            this.relX     = relX;
+            this.relY     = relY;
+        }
+
+        /** Convierte coordenadas porcentuales a píxeles reales. */
+        public Point toPixel(int w, int h) {
+            int fieldH = h - 130; // Descontamos el área del banquillo
+            return new Point((int)(relX * w / 100.0), (int)(relY * fieldH / 100.0));
+        }
     }
 
-    public PanelCampo(List<Jugador> titulares, SelectionListener listener) {
-        this.titulares = titulares;
+    public interface SelectionListener { void onPlayerSelected(Jugador j); }
+
+    /**
+     * Constructor: Configura el tapete verde y habilita los eventos de ratón.
+     */
+    public PanelCampo(Equipo equipo, SelectionListener listener) {
+        this.equipo = equipo;
         this.selectionListener = listener;
-        setBackground(VERDE_CESPED);
-        initCoordenadas();
-        configurarEventos();
+        this.formacion = equipo.getFormacion();
+        
+        setBackground(BG_FIELD_TOP);
+        generarNodosFormacion(formacion);
+        configurarEventosInteractivos();
+        refreshData();
     }
 
-    private void configurarEventos() {
+    // ---------------------------------------------------------------------
+    // BLOQUE: LÓGICA DE ACTUALIZACIÓN TÁCTICA
+    // ---------------------------------------------------------------------
+
+    /** Sincroniza las listas de jugadores locales con el modelo. */
+    public void refreshData() {
+        if (equipo == null) return;
+        this.titulares = equipo.getTitulares();
+        this.suplentes = equipo.getSuplentes();
+        asignarJugadoresANodos();
+        repaint();
+    }
+
+    public void setFormacion(String f) {
+        this.formacion = f;
+        generarNodosFormacion(f);
+        asignarJugadoresANodos();
+        repaint();
+    }
+
+    /** Vincula cada titular con su nodo correspondiente en la pizarra. */
+    public void asignarJugadoresANodos() {
+        for (NodoPosicion n : nodos) n.jugadorAsignado = null;
+        for (Jugador j : titulares) {
+            for (NodoPosicion n : nodos) {
+                if (n.jugadorAsignado == null && n.etiqueta.equals(j.getPosicionNodo())) {
+                    n.jugadorAsignado = j;
+                    break;
+                }
+            }
+        }
+    }
+
+    private void generarNodosFormacion(String f) {
+        nodos.clear();
+        nodos.add(new NodoPosicion("POR", 50, 88)); // Arquero
+        int[] cuotas = parseFormacion(f);
+        generarLinea(cuotas[1], 70, "DEF"); // Zaga
+        generarLinea(cuotas[2], 45, "MED"); // Medular
+        generarLinea(cuotas[3], 20, "DEL"); // Vanguardia
+    }
+
+    private void generarLinea(int num, int y, String label) {
+        for (int i = 0; i < num; i++) {
+            int x = (int)(15 + (70.0 / Math.max(1, num - 1)) * i);
+            nodos.add(new NodoPosicion(label, x, y));
+        }
+    }
+
+    // ---------------------------------------------------------------------
+    // BLOQUE: SISTEMA DRAG & DROP (MANEJO DE EVENTOS)
+    // ---------------------------------------------------------------------
+
+    private void configurarEventosInteractivos() {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                Jugador j = getJugadorEn(e.getX(), e.getY());
-                if (j != null) {
-                    arrastrando = j;
-                    setSeleccionado(j);
-                    if (selectionListener != null) selectionListener.onPlayerSelected(j);
+                // Bloque: Detección de inicio de arrastre
+                arrastrando = getJugadorEn(e.getX(), e.getY());
+                if (arrastrando != null) {
+                    dragPoint = e.getPoint();
+                    setSeleccionado(arrastrando);
                 } else {
                     setSeleccionado(null);
                 }
+                if (selectionListener != null) selectionListener.onPlayerSelected(seleccionado);
+                repaint();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                arrastrando = null;
+                // Bloque: Resolución del destino del jugador
+                if (arrastrando != null) {
+                    NodoPosicion dest = getNodoCercano(e.getX(), e.getY(), 55);
+                    procesarIntercambio(dest);
+                    arrastrando = null;
+                    dragPoint = null;
+                    nodoResaltado = null;
+                    refreshData();
+                }
             }
         });
 
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
+                // Bloque: Feedback visual durante el desplazamiento
                 if (arrastrando != null) {
-                    int w = getWidth();
-                    int h = getHeight();
-                    // Convertir clicks a coordenadas relativas 0-100
-                    int relX = (int) (e.getX() * 100.0 / w);
-                    int relY = (int) (e.getY() * 100.0 / h);
-                    
-                    // Limitar a los bordes del campo
-                    relX = Math.max(5, Math.min(95, relX));
-                    relY = Math.max(5, Math.min(95, relY));
-
-                    arrastrando.setXField(relX);
-                    arrastrando.setYField(relY);
+                    dragPoint = e.getPoint();
+                    nodoResaltado = getNodoCercano(e.getX(), e.getY(), 60);
                     repaint();
                 }
             }
         });
     }
 
-    public void setTitulares(List<Jugador> titulares) {
-        this.titulares = titulares;
-        repaint();
-    }
-
-    public void setSeleccionado(Jugador j) {
-        this.seleccionado = j;
-        repaint();
-    }
-
-    private void initCoordenadas() {
-        // Coordenadas relativas (0-100) para un campo vertical
-        // Portero
-        posicionesCoordenadas.put("POR", new Point(50, 90));
+    private void procesarIntercambio(NodoPosicion destino) {
+        if (destino == null) return;
         
-        // Defensas
-        posicionesCoordenadas.put("LD",  new Point(85, 70));
-        posicionesCoordenadas.put("LI",  new Point(15, 70));
-        posicionesCoordenadas.put("DFC", new Point(50, 75));
-        posicionesCoordenadas.put("DFCI",new Point(35, 75));
-        posicionesCoordenadas.put("DFCD",new Point(65, 75));
-        posicionesCoordenadas.put("DEF", new Point(50, 75)); // fallback
+        Jugador jSale = destino.jugadorAsignado;
+        Jugador jEntra = arrastrando;
 
-        // Medios
-        posicionesCoordenadas.put("MC",  new Point(50, 45));
-        posicionesCoordenadas.put("MCI", new Point(30, 45));
-        posicionesCoordenadas.put("MCR", new Point(70, 45)); 
-        posicionesCoordenadas.put("MCO", new Point(50, 35));
-        posicionesCoordenadas.put("MCD", new Point(50, 58)); 
-        posicionesCoordenadas.put("MD",  new Point(85, 45));
-        posicionesCoordenadas.put("MI",  new Point(15, 45));
-        posicionesCoordenadas.put("MED", new Point(50, 45)); // fallback
-
-        // Delanteros
-        posicionesCoordenadas.put("DC",  new Point(50, 15));
-        posicionesCoordenadas.put("DCI", new Point(35, 15));
-        posicionesCoordenadas.put("DCD", new Point(65, 15));
-        posicionesCoordenadas.put("ED",  new Point(85, 20));
-        posicionesCoordenadas.put("EI",  new Point(15, 20));
-        posicionesCoordenadas.put("DEL", new Point(50, 15)); // fallback
+        if (suplentes.contains(jEntra)) {
+            // Acción: Sustitución (Cambio Suplente -> Titular)
+            if (equipo.realizarCambio(jSale, jEntra)) {
+                jEntra.setPosicionNodo(destino.etiqueta);
+            }
+        } else {
+            // Acción: Movimiento Táctico (Reubicación interna)
+            if (jSale != null) {
+                String labelOrigen = getLabelDeJugador(jEntra);
+                jEntra.setPosicionNodo(destino.etiqueta);
+                jSale.setPosicionNodo(labelOrigen);
+            } else {
+                jEntra.setPosicionNodo(destino.etiqueta);
+            }
+        }
     }
+
+    // ---------------------------------------------------------------------
+    // BLOQUE: MOTOR DE RENDERIZADO (GDI+)
+    // ---------------------------------------------------------------------
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -126,120 +212,149 @@ public class PanelCampo extends JPanel {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int w = getWidth();
-        int h = getHeight();
+        int w = getWidth(), h = getHeight();
+        int fieldH = h - 130;
 
-        // Dibujar campo
-        g2.setColor(LINEAS_CAMPO);
-        g2.setStroke(new BasicStroke(2));
-        g2.drawRect(10, 10, w - 20, h - 20); // Banda
-        g2.drawLine(10, h / 2, w - 10, h / 2); // Medio campo
-        g2.drawOval(w / 2 - 50, h / 2 - 50, 100, 100); // Círculo central
+        // Capa 1: Dibujo del Césped Realista
+        dibujarCampo(g2, w, fieldH);
         
-        // Áreas
-        g2.drawRect(w / 2 - 80, 10, 160, 60); // Área local superior
-        g2.drawRect(w / 2 - 80, h - 70, 160, 60); // Área local inferior
-
-        // Dibujar jugadores
-        if (titulares == null) return;
-
-        // Contador para posiciones duplicadas (ej: 2 DFCs)
-        Map<String, Integer> usados = new HashMap<>();
-
-        for (Jugador j : titulares) {
-            int x, y;
-            if (j.getXField() != -1 && j.getYField() != -1) {
-                x = (int) (j.getXField() * w / 100.0);
-                y = (int) (j.getYField() * h / 100.0);
+        // Capa 2: Representación de Nodos y Cartas de Jugador
+        for (NodoPosicion n : nodos) {
+            Point p = n.toPixel(w, h);
+            if (n.jugadorAsignado != null && n.jugadorAsignado != arrastrando) {
+                dibujarCarta(g2, p.x, p.y, n.jugadorAsignado, n.jugadorAsignado == seleccionado, n.etiqueta);
             } else {
-                String pos = j.getPosicion();
-                int offset = usados.getOrDefault(pos, 0);
-                usados.put(pos, offset + 1);
-
-                Point pRel = getCoordenadaEspecial(pos, offset);
-                x = (int) (pRel.x * w / 100.0);
-                y = (int) (pRel.y * h / 100.0);
+                dibujarSlotVacio(g2, p.x, p.y, n == nodoResaltado, n.etiqueta);
             }
+        }
 
-            dibujarJugador(g2, x, y, j);
+        // Capa 3: Área de Reservas (Banquillo)
+        dibujarBanquillo(g2, w, h);
+
+        // Capa 4: Renderizado de Arrastre (Overlay)
+        if (arrastrando != null && dragPoint != null) {
+            dibujarCarta(g2, dragPoint.x, dragPoint.y, arrastrando, true, arrastrando.getPosicionNodo());
         }
     }
 
-    private Point getCoordenadaEspecial(String pos, int occ) {
-        // Lógica para separar jugadores con la misma etiqueta de posición (ej: dos DFC)
-        if (pos.equals("DFC") && occ == 1) return posicionesCoordenadas.getOrDefault("DFCD", new Point(65, 75));
-        if (pos.equals("DFC") && occ == 0) return posicionesCoordenadas.getOrDefault("DFCI", new Point(35, 75));
+    private void dibujarCampo(Graphics2D g2, int w, int h) {
+        // Bloque: Césped con patrones de corte y degradado
+        g2.setPaint(new GradientPaint(0, 0, BG_FIELD_TOP, 0, h, BG_FIELD_BTM));
+        g2.fillRect(0, 0, w, h);
         
-        // Mediocentros
-        if (pos.equals("MC") && occ == 1)  return posicionesCoordenadas.getOrDefault("MCR", new Point(70, 45));
-        if (pos.equals("MC") && occ == 0)  return posicionesCoordenadas.getOrDefault("MCI", new Point(30, 45));
-        if (pos.equals("MC") && occ == 2)  return posicionesCoordenadas.getOrDefault("MC",  new Point(50, 45));
+        for (int i = 0; i < 10; i++) {
+            g2.setColor(i % 2 == 0 ? CESPED_1 : CESPED_2);
+            g2.fillRect(i * w / 10, 0, w / 10, h);
+        }
         
-        // Mediocentro Defensivo (MCD en el modelo y en el FIFA)
-        if (pos.equals("MCD")) return posicionesCoordenadas.getOrDefault("MCD", new Point(50, 58));
-        
-        return posicionesCoordenadas.getOrDefault(pos, new Point(50, 50));
+        // Líneas reglamentarias (atenuadas)
+        g2.setColor(LINEAS_CAMPO);
+        g2.drawRect(20, 20, w - 40, h - 40);
+        g2.drawOval(w/2-60, h/2-60, 120, 120);
     }
 
-    private void dibujarJugador(Graphics2D g2, int x, int y, Jugador j) {
-        boolean isSel = (seleccionado != null && seleccionado.getId() == j.getId());
+    private void dibujarBanquillo(Graphics2D g2, int w, int h) {
+        int y = h - 130;
+        g2.setColor(new Color(10, 20, 45, 235));
+        g2.fillRect(0, y, w, 130);
+        g2.setColor(UCL_GOLD);
+        g2.drawLine(0, y, w, y); // Separador táctico
         
-        // Sombra
-        g2.setColor(new Color(0, 0, 0, 50));
-        g2.fillOval(x - 22, y - 22, 44, 44);
+        int x = 50;
+        for (Jugador s : suplentes) {
+            if (s != arrastrando) {
+                dibujarCarta(g2, x, y + 65, s, s == seleccionado, s.getPosicion());
+                x += 65;
+            }
+        }
+    }
 
-        // Círculo base
-        g2.setColor(isSel ? new Color(255, 215, 0) : Color.WHITE);
-        g2.fillOval(x - 20, y - 20, 40, 40);
+    private void dibujarCarta(Graphics2D g2, int x, int y, Jugador j, boolean sel, String tag) {
+        // Bloque: Color perimetral según compatibilidad
+        Color cOvr = getColorOvr(j.getCompatibilidadConNodo(tag));
         
-        g2.setColor(new Color(0, 51, 102)); // Azul UCL
-        g2.setStroke(new BasicStroke(isSel ? 3 : 1));
+        if (sel) { // Efecto de aura dorada si está seleccionado
+            g2.setColor(new Color(255, 210, 0, 120));
+            g2.fillOval(x - 26, y - 26, 52, 52);
+        }
+
+        g2.setColor(Color.WHITE);
+        g2.fillOval(x - 20, y - 20, 40, 40);
+        g2.setColor(cOvr);
+        g2.setStroke(new BasicStroke(3));
         g2.drawOval(x - 20, y - 20, 40, 40);
 
-        // Media
-        g2.setFont(new Font("SansSerif", Font.BOLD, 12));
-        String media = String.valueOf(j.getMediaGeneral());
-        FontMetrics fm = g2.getFontMetrics();
-        g2.drawString(media, x - fm.stringWidth(media) / 2, y + 5);
+        // Bloque: Valoración (OVR)
+        g2.setColor(Color.BLACK);
+        g2.setFont(new Font("SansSerif", Font.BOLD, 14));
+        String ovr = String.valueOf(j.getOvrEnPosicion());
+        g2.drawString(ovr, x - g2.getFontMetrics().stringWidth(ovr)/2, y + 5);
 
-        // Nombre y Posición
+        // Bloque: Identificador (Nombre corto)
+        g2.setColor(new Color(0, 0, 0, 180));
+        g2.fillRoundRect(x - 25, y + 25, 50, 14, 5, 5);
+        g2.setColor(Color.WHITE);
         g2.setFont(new Font("SansSerif", Font.BOLD, 10));
-        g2.setColor(Color.WHITE);
-        String txt = j.getPosicion() + " " + j.getNombre();
-        fm = g2.getFontMetrics();
-        
-        // Fondo texto
-        g2.setColor(new Color(0, 0, 0, 150));
-        g2.fillRect(x - fm.stringWidth(txt)/2 - 4, y + 22, fm.stringWidth(txt) + 8, 14);
-        
-        g2.setColor(Color.WHITE);
-        g2.drawString(txt, x - fm.stringWidth(txt) / 2, y + 33);
+        String nom = j.getNombre().substring(0, Math.min(8, j.getNombre().length()));
+        g2.drawString(nom, x - g2.getFontMetrics().stringWidth(nom)/2, y + 36);
     }
 
-    public Jugador getJugadorEn(int mouseX, int mouseY) {
-        int w = getWidth();
-        int h = getHeight();
-        Map<String, Integer> usados = new HashMap<>();
-        
-        for (Jugador j : titulares) {
-            int x, y;
-            if (j.getXField() != -1 && j.getYField() != -1) {
-                x = (int) (j.getXField() * w / 100.0);
-                y = (int) (j.getYField() * h / 100.0);
-            } else {
-                String pos = j.getPosicion();
-                int offset = usados.getOrDefault(pos, 0);
-                usados.put(pos, offset + 1);
+    private void dibujarSlotVacio(Graphics2D g2, int x, int y, boolean hover, String tag) {
+        g2.setColor(hover ? new Color(0, 120, 255, 120) : new Color(255, 255, 255, 45));
+        g2.fillOval(x - 15, y - 15, 30, 30);
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("SansSerif", Font.BOLD, 9));
+        g2.drawString(tag, x - g2.getFontMetrics().stringWidth(tag)/2, y + 30);
+    }
 
-                Point pRel = getCoordenadaEspecial(pos, offset);
-                x = (int) (pRel.x * w / 100.0);
-                y = (int) (pRel.y * h / 100.0);
-            }
+    // ---------------------------------------------------------------------
+    // BLOQUE: CÁLCULOS GEOMÉTRICOS Y PARSING
+    // ---------------------------------------------------------------------
 
-            if (Math.hypot(mouseX - x, mouseY - y) < 25) {
-                return j;
+    private Jugador getJugadorEn(int x, int y) {
+        // Búsqueda en el 11 inicial
+        for (NodoPosicion n : nodos) {
+            Point p = n.toPixel(getWidth(), getHeight());
+            if (n.jugadorAsignado != null && p.distance(x, y) < 30) return n.jugadorAsignado;
+        }
+        // Búsqueda en el banquillo lateral
+        int bY = getHeight() - 130;
+        if (y > bY) {
+            int sx = 50;
+            for (Jugador s : suplentes) {
+                if (new Point(sx, bY + 65).distance(x, y) < 30) return s;
+                sx += 65;
             }
         }
         return null;
+    }
+
+    private NodoPosicion getNodoCercano(int x, int y, int radio) {
+        for (NodoPosicion n : nodos) {
+            if (n.toPixel(getWidth(), getHeight()).distance(x, y) < radio) return n;
+        }
+        return null;
+    }
+
+    private String getLabelDeJugador(Jugador j) {
+        for (NodoPosicion n : nodos) if (n.jugadorAsignado == j) return n.etiqueta;
+        return j.getPosicion();
+    }
+
+    private Color getColorOvr(Compatibilidad c) {
+        return switch (c) {
+            case NATURAL -> OVR_NATURAL;
+            case AFIN    -> OVR_AFIN;
+            default      -> OVR_OPUESTA;
+        };
+    }
+
+    private void setSeleccionado(Jugador j) { this.seleccionado = j; }
+
+    private int[] parseFormacion(String f) {
+        try {
+            String[] p = f.split("-");
+            return new int[]{ 1, Integer.parseInt(p[0]), Integer.parseInt(p[1]), Integer.parseInt(p[2]) };
+        } catch (Exception e) { return new int[]{1, 4, 4, 2}; }
     }
 }

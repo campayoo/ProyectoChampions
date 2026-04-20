@@ -3,22 +3,32 @@ import javax.swing.SwingUtilities;
 import java.io.IOException;
 
 /**
- * Main — punto de entrada de la aplicación.
- * Lanza la ventana principal en el hilo de despacho de eventos de Swing
- * (Event Dispatch Thread) para garantizar la seguridad de la interfaz gráfica.
+ * Clase Main: Punto de entrada oficial de "Proyecto Champions Elite".
+ * 
+ * Se encarga de inicializar el entorno gráfico y arrancar el motor del juego.
  */
 public class Main {
 
+    /**
+     * Método principal (Bootstrap).
+     * 
+     * Implementa el patrón de diseño para aplicaciones Swing, delegando la 
+     * construcción de la interfaz al Event Dispatch Thread (EDT) mediante 
+     * SwingUtilities.invokeLater para evitar problemas de concurrencia.
+     */
     public static void main(String[] args) {
-        // SwingUtilities.invokeLater asegura que toda la UI se crea en el EDT
+        
+        // BLOQUE: Inicialización Controlada de la UI
         SwingUtilities.invokeLater(() -> {
-            MainFrame frame = null;
             try {
-                frame = new MainFrame();
+                // Instanciación de la ventana maestra que contiene toda la lógica visual
+                MainFrame frame = new MainFrame();
+                frame.setVisible(true); // Hace visible la aplicación al usuario
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                // Gestión de errores críticos en la carga de recursos (imágenes, datos)
+                System.err.println("❌ Error crítico al iniciar la aplicación: " + e.getMessage());
+                e.printStackTrace();
             }
-            frame.setVisible(true);
         });
     }
 }

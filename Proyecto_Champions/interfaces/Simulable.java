@@ -1,22 +1,34 @@
 package interfaces;
 
 /**
- * Interfaz Simulable — contrato para cualquier entidad que pueda
- * ser simulada (un Partido, una tanda de penaltis, etc.).
- * USO JUSTIFICADO: Permite tratar distintos tipos de simulación
- * de forma polimórfica en el motor del torneo.
+ * Interfaz Simulable: El 'Motor de Eventos' abstracto.
+ * 
+ * Define el protocolo que debe seguir cualquier proceso que genere resultados
+ * deportivos y narrativa dentro del simulador (e.g., Partidos, Penaltis).
+ * 
+ * RATIONALE:
+ * Facilita el procesamiento polimórfico en la UI, permitiendo tratar
+ * diferentes tipos de competición bajo una misma interfaz de control.
  */
 public interface Simulable {
 
-    /** Ejecuta la simulación completa. */
+    /**
+     * Lanza el proceso de cálculo de eventos y resultados.
+     */
     void simular();
 
-    /** Devuelve el texto narrativo generado. */
+    /**
+     * Recupera el log de sucesos generados durante el proceso.
+     */
     String getNarracion();
 
-    /** True si la simulación ha concluido. */
+    /**
+     * Verifica si el proceso ha llegado a su conclusión lógica.
+     */
     boolean isTerminado();
 
-    /** [golesLocal, golesVisitante] */
+    /**
+     * Retorna el estado actual del marcador [Local, Visitante].
+     */
     int[] getMarcador();
 }
