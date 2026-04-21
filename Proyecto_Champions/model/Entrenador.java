@@ -1,65 +1,78 @@
 package model;
 
 /**
- * Entrenador — subclase de Persona.
- * HERENCIA: hereda id, nombre, edad, nacionalidad de Persona.
- * No implementa Transferible: los entrenadores NO se pueden fichar
- * en este juego; el uso de instanceof en MercadoFichajes comprueba esto.
+ * Clase Entrenador: Representa la identidad del estratega en el banquillo.
+ * 
+ * Modela al Mánager del equipo, cuya veteranía y filosofía táctica aplican
+ * modificadores directos sobre el desempeño de los jugadores durante la simulación.
+ * 
+ * INFLUENCIA TÉCNICA:
+ * - Bonificación por Experiencia (Cohesión de grupo).
+ * - Multiplicadores de Estilo (Especialización Ofensiva/Defensiva).
  */
 public class Entrenador extends Persona {
 
-    private String estilo;            // OFENSIVO | DEFENSIVO | EQUILIBRADO
-    private int    experiencia;       // años de carrera
-    private String formacionFavorita; // e.g. "4-3-3"
+    // --- BLOQUE: PERFIL TÉCNICO ---
+    private String estilo;            // Filosofía (e.g., "Tiki-Taka", "Catenaccio")
+    private int    experiencia;       // Años de carrera profesional
+    private String formacionFavorita; // Dibujo táctico predilecto (e.g., "4-3-3")
 
+    /**
+     * Constructor: Define la identidad y el CV del nuevo preparador.
+     */
     public Entrenador(int id, String nombre, int edad, String nacionalidad,
-                      String estilo, int experiencia, String formacionFavorita) {
+                       String estilo, int experiencia, String formacionFavorita) {
         super(id, nombre, edad, nacionalidad);
         this.estilo            = estilo;
         this.experiencia       = experiencia;
         this.formacionFavorita = formacionFavorita;
     }
 
-    // ── Herencia: implementación obligatoria ─────────────────────────────
     @Override
-    public String getRol() { return "Entrenador"; }
+    public String getRol() { return "Director Técnico"; }
+
+    // ---------------------------------------------------------------------
+    // BLOQUE: ALGORITMOS DE BONIFICACIÓN ESTRATÉGICA
+    // ---------------------------------------------------------------------
 
     /**
-     * Bonificación táctica que aplica el entrenador al equipo.
-     * Cada año de experiencia suma un 0.8 % de rendimiento extra (máx 25 %).
+     * Calcula el factor de 'oficio' basado en la veteranía del técnico.
+     * @return Multiplicador de cohesión (Max 1.25).
      */
     public double getBonificacionTactica() {
-        return Math.min(1.25, 1.0 + experiencia * 0.008);
+        // La experiencia mejora el rendimiento colectivo en un 1% anual
+        return Math.min(1.25, 1.0 + (experiencia * 0.01));
     }
 
     /**
-     * Multiplica el ataque o la defensa del equipo según el estilo del mister.
+     * Determina el peso extra en la zona de ataque según la filosofía del DT.
      */
     public double getMultiplicadorOfensivo() {
-        return switch (estilo) {
-            case "OFENSIVO"    -> 1.15;
-            case "DEFENSIVO"   -> 0.90;
-            default            -> 1.00; // EQUILIBRADO
-        };
+        String est = estilo.toUpperCase();
+        if (est.contains("OFENSIVO") || est.contains("ATAQUE")) return 1.20;
+        if (est.contains("DEFENSIVO")) return 0.85;
+        return 1.00; // Perfil equilibrado
     }
 
+    /**
+     * Determina el refuerzo en la muralla defensiva según la filosofía del DT.
+     */
     public double getMultiplicadorDefensivo() {
-        return switch (estilo) {
-            case "DEFENSIVO"   -> 1.15;
-            case "OFENSIVO"    -> 0.90;
-            default            -> 1.00;
-        };
+        String est = estilo.toUpperCase();
+        if (est.contains("DEFENSIVO") || est.contains("MURO")) return 1.25;
+        if (est.contains("OFENSIVO")) return 0.90;
+        return 1.00; // Perfil equilibrado
     }
 
-    // ── Getters / Setters ─────────────────────────────────────────────────
-    public String getEstilo()                           { return estilo; }
-    public int    getExperiencia()                      { return experiencia; }
-    public String getFormacionFavorita()                { return formacionFavorita; }
-    public void   setFormacionFavorita(String f)        { this.formacionFavorita = f; }
+    // --- ACCESORES TÉCNICOS ---
+    public String getEstilo()            { return estilo; }
+    public String getFormacionFavorita() { return formacionFavorita; }
 
+    /**
+     * Ficha técnica reducida para listados del staff.
+     */
     @Override
     public String toString() {
-        return String.format("%s | %s | %d años exp. | Favorita: %s",
-                nombre, estilo, experiencia, formacionFavorita);
+        return nombre + " [" + estilo + "] - EXP: " + experiencia + "a";
     }
 }

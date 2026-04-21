@@ -4,203 +4,188 @@ import model.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
-import java.io.IOException;
 
 /**
- * PanelAlineacion — permite al usuario gestionar la formación, el estilo de juego
- * y el once inicial de forma visual (estilo FIFA).
+ * Clase PanelAlineacion: Centro de estrategia táctica del club.
+ * 
+ * Permite al usuario configurar el esquema de juego (4-4-2, 4-3-3, etc.), 
+ * seleccionar la mentalidad táctica y gestionar el once inicial de forma visual 
+ * mediante un campo interactivo.
+ * 
+ * MEJORAS DE ACCESIBILIDAD:
+ * - Se ha implementado un JScrollPane para la columna de comandos para asegurar la visibilidad.
+ * - Estilización de botones según el estándar Champions Elite.
  */
 public class PanelAlineacion extends JPanel {
 
+    // --- Referencias de Control ---
     private final MainFrame frame;
     private final Equipo    equipo;
 
+    // --- Paleta de Colores "Champions Elite" ---
     private static final Color BG_DARK  = new Color(10, 14, 30);
     private static final Color BG_CARD  = new Color(20, 28, 58);
     private static final Color UCL_BLUE = new Color(0, 100, 255);
     private static final Color UCL_GOLD = new Color(255, 210, 0);
-    private static final Color VERDE    = new Color(0, 200, 100);
-    private static final Color BLANCO   = Color.WHITE;
     private static final Color GRIS     = new Color(160, 175, 210);
 
+    // --- Elementos de Interfaz ---
     private JComboBox<String> cmbFormacion;
     private JComboBox<String> cmbTactica;
     private PanelCampo        panelCampo;
-    private JList<Jugador>    listSuplentes;
-    
-    private Jugador seleccionadoBanquillo = null;
 
+    /**
+     * Constructor: Inicializa la pizarra de estrategia.
+     */
     public PanelAlineacion(MainFrame frame, Equipo equipo) {
         this.frame  = frame;
         this.equipo = equipo;
+        
         setBackground(BG_DARK);
         setLayout(new BorderLayout(15, 15));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
         construirUI();
     }
 
+    /**
+     * Construcción de la Interfaz: Cabecera, Controles y el Tapete Verde.
+     */
     private void construirUI() {
-        // ── Cabecera ──────────────────────────────────────────────────────
+        // BLOQUE: Título de Sección
         JLabel lblTitulo = new JLabel("⚙ Estrategia y Alineación Visual", SwingConstants.LEFT);
         lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 26));
         lblTitulo.setForeground(UCL_GOLD);
         add(lblTitulo, BorderLayout.NORTH);
 
-        // ── Panel Central ─────────────────────────────────────────────────
+        // BLOQUE: Cuerpo Central
         JPanel centro = new JPanel(new BorderLayout(20, 0));
         centro.setBackground(BG_DARK);
 
-        // --- Columna Izquierda: Controles y Banquillo ---
-        JPanel colIzq = new JPanel();
-        colIzq.setLayout(new BoxLayout(colIzq, BoxLayout.Y_AXIS));
-        colIzq.setBackground(BG_DARK);
-        colIzq.setPreferredSize(new Dimension(340, 0));
+        // Sub-Bloque: Panel de Parámetros (Contenedor con Scroll)
+        JPanel colIzqContent = new JPanel();
+        colIzqContent.setLayout(new BoxLayout(colIzqContent, BoxLayout.Y_AXIS));
+        colIzqContent.setBackground(BG_DARK);
 
-        // Esquema Táctico
+        // Bloque: Marco de Configuración Táctica
         JPanel pnlForm = seccionPanel(" 📋 Configuración ");
         cmbFormacion = new JComboBox<>(new String[]{"4-4-2", "4-3-3", "3-5-2", "5-3-2", "4-5-1", "3-4-3"});
         cmbFormacion.setSelectedItem(equipo.getFormacion());
         estilizarCombo(cmbFormacion);
         
-        cmbTactica = new JComboBox<>(new String[]{"Equilibrada", "Tiki Taka", "Contraataque", "Autobús", "Por las bandas"});
+        cmbTactica = new JComboBox<>(new String[]{"Equilibrada", "Tiki Taka", "Contraataque", "Autobús", "Ofensiva Total"});
         cmbTactica.setSelectedItem(equipo.getTactica());
         estilizarCombo(cmbTactica);
 
-        JButton btnAuto = boton("🔄 Auto-Alinear Mejores", UCL_BLUE, BLANCO);
-        btnAuto.addActionListener(e -> {
-            equipo.setFormacion(cmbFormacion.getSelectedItem().toString());
-            equipo.setTactica(cmbTactica.getSelectedItem().toString());
-            equipo.establecerMejorOnce();
-            actualizarVistas();
+        // Listeners: Sincronización en tiempo real
+        cmbFormacion.addActionListener(e -> {
+            if (panelCampo != null) panelCampo.setFormacion(cmbFormacion.getSelectedItem().toString());
         });
         
-        pnlForm.add(etiqueta("Formación:"));
+        pnlForm.add(etiqueta("Dibujo Táctico:"));
         pnlForm.add(cmbFormacion);
         pnlForm.add(Box.createVerticalStrut(10));
-        pnlForm.add(etiqueta("Estilo de Juego (Táctica):"));
+        pnlForm.add(etiqueta("Mentalidad:"));
         pnlForm.add(cmbTactica);
-        pnlForm.add(Box.createVerticalStrut(15));
-        pnlForm.add(btnAuto);
+        
+        colIzqContent.add(pnlForm);
+        colIzqContent.add(Box.createVerticalStrut(15));
+        
+        // Bloque: Panel de Gestión Operativa (Botones)
+        JPanel pnlAcciones = seccionPanel(" ⚡ Acciones ");
+        
+        JButton btnAuto = UCLTheme.uclButton("🔄 Auto-Alinear Mejores", UCLTheme.UCL_BLUE);
+        btnAuto.addActionListener(e -> ejecutarAutoAlineacion());
 
-        // Banquillo
-        listSuplentes = crearListaJugadores();
-        listSuplentes.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                seleccionadoBanquillo = listSuplentes.getSelectedValue();
-                if (seleccionadoBanquillo != null) {
-                    frame.setEstado("Sustituto: " + seleccionadoBanquillo.getNombre() + ". Haz click en el Titular a cambiar en el campo.");
-                    panelCampo.setSeleccionado(null);
-                }
-            }
-        });
+        JButton btnVolver = UCLTheme.uclButton("← Volver", new Color(80, 90, 110));
+        btnVolver.addActionListener(e -> volverAlTorneo());
 
-        colIzq.add(pnlForm);
-        colIzq.add(Box.createVerticalStrut(15));
-        colIzq.add(scrollConTitulo(listSuplentes, " 🪑 Banquillo (Suplentes) "));
+        JButton btnJugar  = UCLTheme.uclButton("⚽ Confirmar Táctica", UCLTheme.VERDE);
+        btnJugar.addActionListener(e -> guardarYComenzar());
+        
+        pnlAcciones.add(btnAuto);
+        pnlAcciones.add(Box.createVerticalStrut(10));
+        
+        // Fila de navegación secundaria
+        JPanel pnlFilaFinal = new JPanel(new GridLayout(1, 2, 10, 0));
+        pnlFilaFinal.setOpaque(false);
+        pnlFilaFinal.add(btnVolver);
+        pnlFilaFinal.add(btnJugar);
+        pnlAcciones.add(pnlFilaFinal);
+        
+        colIzqContent.add(pnlAcciones);
 
-        // --- Panel Derecha: Campo FIFA ---
-        panelCampo = new PanelCampo(equipo.getTitulares(), j -> {
+        // Integración de Scroll en la columna izquierda
+        JScrollPane scrollIzq = new JScrollPane(colIzqContent);
+        scrollIzq.setBorder(null);
+        scrollIzq.setOpaque(false);
+        scrollIzq.getViewport().setOpaque(false);
+        scrollIzq.setPreferredSize(new Dimension(340, 0));
+
+        // Sub-Bloque: Representación del Terreno de Juego (Derecha)
+        panelCampo = new PanelCampo(equipo, j -> {
             if (j != null) {
-                if (seleccionadoBanquillo != null) {
-                    // Realizar cambio
-                    if (equipo.realizarCambio(j, seleccionadoBanquillo)) {
-                        seleccionadoBanquillo = null;
-                        listSuplentes.clearSelection();
-                        actualizarVistas();
-                        frame.setEstado("🔄 Cambio realizado: " + j.getNombre() + " sale del campo.");
-                    } else {
-                        JOptionPane.showMessageDialog(null, "No se pudo realizar el cambio.");
-                    }
-                } else {
-                    // Solo seleccionar visualmente
-                    panelCampo.setSeleccionado(j);
-                    frame.setEstado("Titular: " + j.getNombre() + " (" + j.getPosicion() + ") | Med: " + j.getMediaGeneral());
-                }
-            } else {
-                panelCampo.setSeleccionado(null);
+                String desc = String.format("👤 %s | OVR: %d | %s", 
+                                            j.getNombre(), j.getOvrEnPosicion(), j.getCompatibilidad());
+                frame.setEstado(desc);
             }
         });
 
-        centro.add(colIzq, BorderLayout.WEST);
+        centro.add(scrollIzq, BorderLayout.WEST);
         centro.add(panelCampo, BorderLayout.CENTER);
         add(centro, BorderLayout.CENTER);
-
-        // ── Botonera Inferior ─────────────────────────────────────────────
-        JPanel sur = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
-        sur.setBackground(BG_DARK);
-
-        JButton btnVolver = boton("← Volver", BG_CARD, GRIS);
-        JButton btnJugar  = boton("⚽ Confirmar y Jugar", VERDE, BLANCO);
-        btnJugar.setFont(new Font("SansSerif", Font.BOLD, 16));
-
-        btnVolver.addActionListener(e -> {
-            try {
-                frame.mostrarPantalla(MainFrame.PANTALLA_TORNEO);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-        btnJugar.addActionListener(e -> {
-            if (frame.getEliminatoriaActual() == null) {
-                JOptionPane.showMessageDialog(this, "No hay ningún partido pendiente.");
-                return;
-            }
-            equipo.setFormacion(cmbFormacion.getSelectedItem().toString());
-            equipo.setTactica(cmbTactica.getSelectedItem().toString());
-            try {
-                frame.mostrarPantalla(MainFrame.PANTALLA_PARTIDO);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-
-        sur.add(btnVolver);
-        sur.add(btnJugar);
-        add(sur, BorderLayout.SOUTH);
 
         actualizarVistas();
     }
 
-    private void actualizarVistas() {
-        DefaultListModel<Jugador> modelSups = new DefaultListModel<>();
-        for (Jugador j : equipo.getSuplentes()) modelSups.addElement(j);
-        listSuplentes.setModel(modelSups);
+    // ---------------------------------------------------------------------
+    // BLOQUE: LÓGICA DE CONTROL TÁCTICO
+    // ---------------------------------------------------------------------
+
+    /**
+     * Motor de Alineación Inteligente:
+     * Aplica el algoritmo de optimización del club y refresca la pantalla.
+     */
+    private void ejecutarAutoAlineacion() {
+        equipo.setFormacion(cmbFormacion.getSelectedItem().toString());
+        equipo.setTactica(cmbTactica.getSelectedItem().toString());
+        equipo.establecerMejorOnce(); 
         
         if (panelCampo != null) {
-            panelCampo.setTitulares(equipo.getTitulares());
+            panelCampo.setFormacion(cmbFormacion.getSelectedItem().toString());
+            panelCampo.asignarJugadoresANodos();
+        }
+        actualizarVistas();
+        frame.setEstado("🧠 Algoritmo: Pizarra optimizada para ganar.");
+    }
+
+    private void volverAlTorneo() {
+        try { frame.mostrarPantalla(MainFrame.PANTALLA_TORNEO); } catch (Exception ignored) {}
+    }
+
+    /**
+     * Persiste los cambios tácticos y avanza a la retransmisión.
+     */
+    private void guardarYComenzar() {
+        if (frame.getEliminatoriaActual() == null) return;
+        equipo.setFormacion(cmbFormacion.getSelectedItem().toString());
+        equipo.setTactica(cmbTactica.getSelectedItem().toString());
+        try { frame.mostrarPantalla(MainFrame.PANTALLA_PARTIDO); } catch (Exception ignored) {}
+    }
+
+    /**
+     * Refresco visual de los componentes de representación.
+     */
+    public void actualizarVistas() {
+        if (panelCampo != null) {
+            panelCampo.refreshData();
+            panelCampo.repaint(); 
         }
     }
 
-    private JList<Jugador> crearListaJugadores() {
-        JList<Jugador> list = new JList<>();
-        list.setBackground(BG_CARD);
-        list.setForeground(BLANCO);
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list.setCellRenderer(new PlayerListRenderer());
-        return list;
-    }
-
-    private class PlayerListRenderer extends DefaultListCellRenderer {
-        @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            if (value instanceof Jugador j) {
-                int pct = (int)(100.0 * j.getEnergiaActual() / Math.max(1, j.getEnergiaMax()));
-                label.setText(String.format(" [%-4s] %-18s | Med:%2d | ⚡%d%%", 
-                    j.getPosicion(), j.getNombre(), j.getMediaGeneral(), pct));
-                label.setFont(new Font("Monospaced", Font.PLAIN, 12));
-                label.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
-                if (isSelected) {
-                    label.setBackground(UCL_BLUE);
-                    label.setForeground(BLANCO);
-                } else {
-                    label.setBackground(BG_CARD);
-                    label.setForeground(BLANCO);
-                }
-            }
-            return label;
-        }
-    }
+    // ---------------------------------------------------------------------
+    // BLOQUE: ASISTENTES DE ESTILIZACIÓN (UCL Look)
+    // ---------------------------------------------------------------------
 
     private JPanel seccionPanel(String titulo) {
         JPanel p = new JPanel();
@@ -210,45 +195,19 @@ public class PanelAlineacion extends JPanel {
             BorderFactory.createLineBorder(UCL_BLUE), titulo,
             TitledBorder.LEFT, TitledBorder.TOP,
             new Font("SansSerif", Font.BOLD, 13), UCL_GOLD));
-        p.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
         return p;
-    }
-
-    private JScrollPane scrollConTitulo(Component comp, String titulo) {
-        JScrollPane scroll = new JScrollPane(comp);
-        scroll.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(UCL_BLUE), titulo,
-            TitledBorder.LEFT, TitledBorder.TOP,
-            new Font("SansSerif", Font.BOLD, 12), UCL_GOLD));
-        scroll.getViewport().setBackground(BG_CARD);
-        return scroll;
     }
 
     private JLabel etiqueta(String texto) {
         JLabel lbl = new JLabel(texto);
         lbl.setForeground(GRIS);
         lbl.setFont(new Font("SansSerif", Font.BOLD, 11));
-        lbl.setAlignmentX(LEFT_ALIGNMENT);
         return lbl;
     }
 
     private void estilizarCombo(JComboBox<String> cmb) {
         cmb.setBackground(BG_DARK);
-        cmb.setForeground(BLANCO);
-        cmb.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        cmb.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
-        cmb.setAlignmentX(LEFT_ALIGNMENT);
-    }
-
-    private JButton boton(String texto, Color bg, Color fg) {
-        JButton btn = new JButton(texto);
-        btn.setBackground(bg);
-        btn.setForeground(fg);
-        btn.setFont(new Font("SansSerif", Font.BOLD, 13));
-        btn.setFocusPainted(false);
-        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-        btn.setAlignmentX(LEFT_ALIGNMENT);
-        return btn;
+        cmb.setForeground(Color.WHITE);
+        cmb.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
     }
 }

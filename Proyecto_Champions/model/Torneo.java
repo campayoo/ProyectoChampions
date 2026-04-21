@@ -3,156 +3,165 @@ package model;
 import java.util.*;
 
 /**
- * Torneo — gestiona la UCL desde Octavos hasta la Final.
- *
- * USO DE ArrayList : equipos activos y eliminados (orden importa, acceso por índice).
- * USO DE HashSet   : idsRegistrados garantiza que no haya IDs de jugador duplicados
- *                    en todo el sistema (inserción O(1), búsqueda O(1)).
- * USO DE TreeSet   : tableroGoleadores mantiene los jugadores ordenados por goles
- *                    (desc) de forma automática gracias a Comparable<Jugador>.
+ * Clase Torneo: Cerebro organizador de la UEFA Champions League.
+ * 
+ * Orquesta el ciclo completo de la competición, desde el sorteo de octavos
+ * hasta la coronación del campeón en la gran final.
+ * 
+ * DATOS TÉCNICOS:
+ * - Gestiona la transición entre fases (Octavos, Cuartos, etc.).
+ * - Mantiene un ranking dinámico (TreeSet) de máximos goleadores.
+ * - Sortea los cruces de forma aleatoria simulando bombos reales.
  */
 public class Torneo {
 
+    // --- BLOQUE: ESTRUCTURAS DE MEMORIA ---
     private final String                 nombre;
-    private final ArrayList<Equipo>      equipos;           // ← ArrayList
-    private final ArrayList<Equipo>      equiposEliminados; // ← ArrayList
-    private final ArrayList<Eliminatoria> eliminatorias;    // ← ArrayList
-    private final TreeSet<Jugador>       tableroGoleadores; // ← TreeSet (auto-ordenado)
-    private final HashSet<Integer>       idsRegistrados;    // ← HashSet (sin duplicados)
+    private final ArrayList<Equipo>      equipos;           // Clubes vivos en la competición
+    private final ArrayList<Equipo>      equiposEliminados; // Clubes fuera del cuadro
+    private final ArrayList<Eliminatoria> eliminatorias;    // Cruces activos de la fase
+    private final TreeSet<Jugador>       tableroGoleadores; // Ranking ordenado por goles (TreeSet)
+    private final HashSet<Integer>       idsRegistrados;    // Registro para evitar colisión de IDs
 
-    private Equipo equipoUsuario;
-    private int    rondaActual; // 0=Octavos, 1=Cuartos, 2=Semis, 3=Final
+    private Equipo equipoUsuario;    // Club controlado por el jugador
+    private int    rondaActual;      // Índice de fase (0 a 3)
 
+    // Denominaciones oficiales de la UEFA para el HUD
     private static final String[] NOMBRES_RONDA =
-        {"Octavos de Final", "Cuartos de Final", "Semifinales", "FINAL"};
+        {"Octavos de Final", "Cuartos de Final", "Semifinales", "GRAN FINAL"};
 
-    // ─────────────────────────────────────────────────────────────────────
+    /**
+     * Constructor: Configura el entorno competitivo inicial.
+     */
     public Torneo(String nombre) {
         this.nombre            = nombre;
-        this.equipos           = new ArrayList<>();           // ← ArrayList
-        this.equiposEliminados = new ArrayList<>();           // ← ArrayList
-        this.eliminatorias     = new ArrayList<>();           // ← ArrayList
-        // TreeSet usa Comparable<Jugador>.compareTo → ordena por goles desc
-        this.tableroGoleadores = new TreeSet<>();             // ← TreeSet
-        // HashSet previene IDs duplicados de jugadores en todo el torneo
-        this.idsRegistrados    = new HashSet<>();             // ← HashSet
+        this.equipos           = new ArrayList<>();
+        this.equiposEliminados = new ArrayList<>();
+        this.eliminatorias     = new ArrayList<>();
+        this.tableroGoleadores = new TreeSet<>();
+        this.idsRegistrados    = new HashSet<>();
         this.rondaActual       = 0;
     }
 
-    // ── Carga de equipos ─────────────────────────────────────────────────
+    // ---------------------------------------------------------------------
+    // BLOQUE: GESTIÓN DE PARTICIPANTES E INTEGRIDAD
+    // ---------------------------------------------------------------------
 
-    /** Agrega un equipo y registra los IDs de sus jugadores en el HashSet. */
+    /**
+     * Inscribe a un club y sincroniza sus jugadores con el registro maestro.
+     */
     public void agregarEquipo(Equipo equipo) {
-        equipos.add(equipo); // ArrayList.add
+        equipos.add(equipo);
 
-        // USO DE HashSet: add() devuelve false si el ID ya existe (duplicado)
+        // Bloque: Monitorización de IDs para evitar duplicidad en la base de datos
         for (Jugador j : equipo.getPlantilla()) {
-            if (!idsRegistrados.add(j.getId())) { // ← HashSet.add (O(1))
-                System.err.println("⚠ ID duplicado detectado: " + j.getId()
-                        + " (" + j.getNombre() + ")");
+            if (!idsRegistrados.add(j.getId())) {
+                System.err.println("🚨 CONFLICTO: Se ha detectado un ID duplicado (" + j.getId() + ").");
             }
         }
-        // Añade jugadores al TreeSet de goleadores (se ordena solo)
-        tableroGoleadores.addAll(equipo.getPlantilla()); // ← TreeSet.addAll
+        tableroGoleadores.addAll(equipo.getPlantilla());
     }
+
+    public boolean existeIdJugador(int id) { return idsRegistrados.contains(id); }
+    public boolean registrarNuevoId(int id) { return idsRegistrados.add(id); }
+
+    // ---------------------------------------------------------------------
+    // BLOQUE: SORTEOS Y GESTIÓN DE FASES
+    // ---------------------------------------------------------------------
 
     /**
-     * Verifica si un ID de jugador ya está registrado.
-     * USO DE HashSet: contains() en O(1).
+     * Motor de Sorteo: Genera emparejamientos mediante mezcla aleatoria (shuffle).
      */
-    public boolean existeIdJugador(int id) {
-        return idsRegistrados.contains(id); // ← HashSet.contains
-    }
-
-    /**
-     * Registra un ID nuevo (ej. al fichar un jugador externo).
-     * @return false si ya existía (duplicado).
-     */
-    public boolean registrarNuevoId(int id) {
-        return idsRegistrados.add(id); // ← HashSet.add
-    }
-
-    // ── Generación de cruces ──────────────────────────────────────────────
-
-    /** Genera los cruces aleatorios para la ronda actual. */
     public void generarCruces() {
         eliminatorias.clear();
-        ArrayList<Equipo> mezclados = new ArrayList<>(equipos); // copia
-        Collections.shuffle(mezclados);
+        ArrayList<Equipo> bombos = new ArrayList<>(equipos);
+        Collections.shuffle(bombos); // Mezclado aleatorio simulando sorteo
 
         boolean esFinal = (rondaActual == 3);
-        for (int i = 0; i + 1 < mezclados.size(); i += 2) {
-            eliminatorias.add(
-                new Eliminatoria(mezclados.get(i), mezclados.get(i + 1), !esFinal)
-            );
+        for (int i = 0; i + 1 < bombos.size(); i += 2) {
+            // Regla: Ida/Vuelta en fases previas, Partido único en Gran Final
+            eliminatorias.add(new Eliminatoria(bombos.get(i), bombos.get(i + 1), !esFinal));
         }
     }
 
-    // ── Avance de ronda ───────────────────────────────────────────────────
-
     /**
-     * Mueve los equipos eliminados a la lista de eliminados y
-     * establece la nueva lista activa con los clasificados.
+     * Procesa el cambio de ronda: Clasifica ganadores y elimina perdedores.
      */
     public void avanzarRonda(ArrayList<Equipo> clasificados) {
+        // Bloque: Cribado de equipos eliminados
         for (Equipo e : equipos) {
-            if (!clasificados.contains(e)) {
-                equiposEliminados.add(e);      // ArrayList.add
-                // Poner sus jugadores disponibles en el mercado (por defecto false)
-            }
+            if (!clasificados.contains(e)) equiposEliminados.add(e);
         }
+        
         equipos.clear();
-        equipos.addAll(clasificados);          // ArrayList.addAll
+        equipos.addAll(clasificados);
         rondaActual++;
-        if (rondaActual < 4) generarCruces();
+        
+        // Si no hemos terminado, lanzamos nuevo sorteo
+        if (rondaActual < 4 && !clasificados.isEmpty()) {
+            generarCruces();
+        }
     }
 
-    // ── Goleadores ────────────────────────────────────────────────────────
+    // ---------------------------------------------------------------------
+    // BLOQUE: RANKING Y ESTADÍSTICAS (GOLEADORES)
+    // ---------------------------------------------------------------------
 
     /**
-     * Devuelve los N máximos goleadores.
-     * El TreeSet ya está ordenado (por compareTo de Jugador), sólo cortamos.
+     * Retorna el ranking de los mejores anotadores con goles a favor.
      */
     public ArrayList<Jugador> getTopGoleadores(int n) {
         ArrayList<Jugador> top = new ArrayList<>();
         int count = 0;
-        // USO DE Iterator sobre TreeSet (orden garantizado)
-        Iterator<Jugador> it = tableroGoleadores.iterator(); // ← Iterator
+        
+        // Navegación por el set ordenado
+        Iterator<Jugador> it = tableroGoleadores.iterator();
         while (it.hasNext() && count < n) {
             Jugador j = it.next();
-            if (j.getGoles() > 0) { top.add(j); count++; }
+            if (j.getGoles() > 0) { 
+                top.add(j); 
+                count++; 
+            }
         }
         return top;
     }
 
-    /** Reconstruye el TreeSet con datos actualizados (después de cada partido). */
+    /**
+     * Actualiza el TreeSet para reflejar los nuevos goles tras una ronda de partidos.
+     */
     public void refrescarGoleadores() {
         tableroGoleadores.clear();
         for (Equipo e : equipos)           tableroGoleadores.addAll(e.getPlantilla());
         for (Equipo e : equiposEliminados) tableroGoleadores.addAll(e.getPlantilla());
     }
 
-    // ── Info de ronda ─────────────────────────────────────────────────────
+    // ---------------------------------------------------------------------
+    // BLOQUE: CONSULTAS DE ESTADO DEL TORNEO
+    // ---------------------------------------------------------------------
+
+    public String getNombreRonda() {
+        if (rondaActual < NOMBRES_RONDA.length) return NOMBRES_RONDA[rondaActual];
+        return "FIN DE LA COMPETICIÓN";
+    }
+
+    /**
+     * Verifica si se ha llegado a la conclusión del torneo.
+     */
+    public boolean isTerminado() { 
+        // Lógica de finalización por fases o por número de equipos restantes
+        if (rondaActual >= 4) return true;
+        if (rondaActual == 3 && !eliminatorias.isEmpty() && eliminatorias.get(0).isCompleta()) return true;
+        return (rondaActual > 0 && equipos.size() <= 1); 
+    }
 
     public Equipo getGanadorTorneo() {
         if (!isTerminado() || eliminatorias.isEmpty()) return null;
-        // La última eliminatoria de la lista es la final
         return eliminatorias.get(eliminatorias.size() - 1).getGanador();
     }
 
-    public String getNombreRonda() {
-        return rondaActual < NOMBRES_RONDA.length ? NOMBRES_RONDA[rondaActual] : "Torneo Finalizado";
-    }
-
-    public boolean isTerminado() { return rondaActual >= 4 || equipos.size() <= 1; }
-
-    // ── Getters ───────────────────────────────────────────────────────────
-    public String                  getNombre()            { return nombre; }
+    // --- ACCESORES DE ESTADO ---
     public ArrayList<Equipo>       getEquipos()           { return equipos; }
-    public ArrayList<Equipo>       getEquiposEliminados() { return equiposEliminados; }
     public ArrayList<Eliminatoria> getEliminatorias()     { return eliminatorias; }
-    public TreeSet<Jugador>        getTableroGoleadores() { return tableroGoleadores; }
-    public HashSet<Integer>        getIdsRegistrados()    { return idsRegistrados; }
     public Equipo                  getEquipoUsuario()     { return equipoUsuario; }
     public void                    setEquipoUsuario(Equipo e) { this.equipoUsuario = e; }
     public int                     getRondaActual()       { return rondaActual; }

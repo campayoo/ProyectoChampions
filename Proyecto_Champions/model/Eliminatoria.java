@@ -1,146 +1,165 @@
 package model;
 
-
 /**
- * Eliminatoria — gestiona la ida y vuelta (o la final a partido único)
- * entre dos equipos. Calcula el clasificado considerando el global y,
- * si hay empate, ejecuta los penaltis a través del Partido de ida.
+ * Clase Eliminatoria: Coordinadora de llaves en el cuadro competitivo.
+ * 
+ * Gestiona el enfrentamiento táctico entre dos clubes, controlando el flujo
+ * de partidos (Ida/Vuelta), calculando el marcador global y certificando
+ * quién es el ganador legítimo para avanzar de ronda.
  */
 public class Eliminatoria {
 
-    private final Equipo equipoA;
-    private final Equipo equipoB;
-    private final boolean doblePartido; // false → Final (partido único)
+    // --- BLOQUE: CONFIGURACIÓN DE LA LLAVE ---
+    private final Equipo equipoA;       // Club con localía en la Ida
+    private final Equipo equipoB;       // Club con localía en la Vuelta
+    private final boolean doblePartido; // Formato: true (Ida/Vta), false (Final única)
 
-    private Partido ida;
-    private Partido vuelta;
-    private Equipo  ganador;
+    // --- BLOQUE: REGISTRO DE ENCUENTROS ---
+    private Partido ida;                // Primer round
+    private Partido vuelta;             // Segundo round
+    private Equipo  ganador;            // Club clasificado
 
-    // ─────────────────────────────────────────────────────────────────────
+    /**
+     * Constructor: Inicializa el marco de la eliminatoria.
+     */
     public Eliminatoria(Equipo equipoA, Equipo equipoB, boolean doblePartido) {
         this.equipoA      = equipoA;
         this.equipoB      = equipoB;
         this.doblePartido = doblePartido;
     }
 
-    // ── Simulación automática (para los partidos de la IA) ───────────────
+    // ---------------------------------------------------------------------
+    // BLOQUE: SIMULACIÓN EN SEGUNDO PLANO (MODO CPU)
+    // ---------------------------------------------------------------------
 
-    /** Juega la ida automáticamente. */
+    /**
+     * Ejecuta el partido de ida de forma automatizada (IA vs IA).
+     */
     public void jugarIdaAuto() {
         ida = new Partido(equipoA, equipoB);
         ida.simular();
     }
 
-    /** Juega la vuelta automáticamente y determina el clasificado. */
+    /**
+     * Ejecuta el partido de vuelta y actualiza el vencedor por marcador global.
+     */
     public void jugarVueltaAuto() {
-        if (!doblePartido) { determinarGanador(); return; }
-        vuelta = new Partido(equipoB, equipoA); // B es local en vuelta
+        if (!doblePartido) { 
+            determinarGanador(); 
+            return; 
+        }
+        // Inversión de localía para el segundo encuentro
+        vuelta = new Partido(equipoB, equipoA);
         vuelta.simular();
         determinarGanador();
     }
 
-    /** Determina el ganador de la eliminatoria si no hay empate. */
+    // ---------------------------------------------------------------------
+    // BLOQUE: CÓMPUTO DE RESULTADOS Y DESEMPATES
+    // ---------------------------------------------------------------------
+
+    /**
+     * Calcula el equipo clasificado sumando los goles de ambos encuentros.
+     */
     public void determinarGanador() {
+        // Bloque: Caso de Partido Único (Final UEFA)
         if (!doblePartido) {
-            // Final: partido único
             if (ida != null && ida.isTerminado()) {
                 ganador = ida.getGanador();
             }
             return;
         }
 
+        // Bloque: Caso de Eliminatoria Doble
         if (ida == null || !ida.isTerminado() || vuelta == null || !vuelta.isTerminado()) return;
 
-        // Doble partido: suma de goles
+        // Cómputo global de goles
         int golesA = ida.getGolesLocal()     + vuelta.getGolesVisitante();
         int golesB = ida.getGolesVisitante() + vuelta.getGolesLocal();
 
-        if (golesA > golesB) {
-            ganador = equipoA;
-        } else if (golesB > golesA) {
-            ganador = equipoB;
-        } else {
-            // Empate global -> No hay ganador deportivo.
-            // Para que el torneo no se rompa, si no es el usuario, resolvemos por suerte o fuerza.
-            ganador = null; 
-        }
+        if (golesA > golesB)      ganador = equipoA;
+        else if (golesB > golesA) ganador = equipoB;
+        else                      ganador = null; // Empate global que escala a penaltis
     }
 
-    /** Resolución forzada para simulaciones de la IA. */
+    /**
+     * Algoritmo de resolución para simulaciones rápidas donde no interviene el usuario.
+     */
     public void resolverEmpateIA() {
         if (ganador != null) return;
-        // El que tenga más poder total gana el desempate "en los despachos"
-        if (equipoA.getPoderofensivo() + equipoA.getPoderDefensivo() > 
-            equipoB.getPoderofensivo() + equipoB.getPoderDefensivo()) {
-            ganador = equipoA;
-        } else {
-            ganador = equipoB;
-        }
+        // En caso de empate técnico total, avanza el club con mejor ratio OVR
+        double poderA = equipoA.getPoderOfensivo() + equipoA.getPoderDefensivo();
+        double poderB = equipoB.getPoderOfensivo() + equipoB.getPoderDefensivo();
+        ganador = (poderA > poderB) ? equipoA : equipoB;
     }
 
-    /** Verifica si la eliminatoria ha terminado en empate global y requiere penaltis. */
+    /**
+     * Determina si la igualdad en el global exige una tanda de penaltis.
+     */
     public boolean requierePenaltis() {
+        // Verificación en partido único
         if (!doblePartido) {
-            return ida != null && ida.isTerminado() && ida.getGolesLocal() == ida.getGolesVisitante() && !ida.isNecesitaPenaltis();
+            return ida != null && ida.isTerminado() && ida.getGolesLocal() == ida.getGolesVisitante();
         }
+        // Verificación en doble partido
         if (ida == null || !ida.isTerminado() || vuelta == null || !vuelta.isTerminado()) return false;
         
         int golesA = ida.getGolesLocal()     + vuelta.getGolesVisitante();
         int golesB = ida.getGolesVisitante() + vuelta.getGolesLocal();
-        return golesA == golesB && !vuelta.isNecesitaPenaltis();
+        return golesA == golesB;
     }
 
-    // ── Creación de partidos para el jugador humano ───────────────────────
+    // ---------------------------------------------------------------------
+    // BLOQUE: CONTROL DE PARTIDOS JUGABLES (USER MODE)
+    // ---------------------------------------------------------------------
 
-    /** Crea el partido de ida (sin simularlo). */
     public Partido crearPartidoIda() {
         ida = new Partido(equipoA, equipoB);
         return ida;
     }
 
-    /** Crea el partido de vuelta (sin simularlo). */
     public Partido crearPartidoVuelta() {
         vuelta = new Partido(equipoB, equipoA);
         return vuelta;
     }
 
-    // ── Resumen en texto ──────────────────────────────────────────────────
-
+    /**
+     * Genera un informe textual del estado de la llave para el panel de Torneo.
+     */
     public String getResumen() {
         StringBuilder sb = new StringBuilder();
-        sb.append(equipoA.getNombre()).append("  vs  ").append(equipoB.getNombre()).append("\n");
+        sb.append(equipoA.getNombre()).append(" vs ").append(equipoB.getNombre());
 
         if (ida != null && ida.isTerminado()) {
-            sb.append("  Ida:    ").append(ida.getGolesLocal())
-              .append(" - ").append(ida.getGolesVisitante()).append("\n");
+            sb.append("\n [IDA] ").append(ida.getGolesLocal()).append(" - ").append(ida.getGolesVisitante());
         }
         if (vuelta != null && vuelta.isTerminado()) {
-            sb.append("  Vuelta: ").append(vuelta.getGolesLocal())
-              .append(" - ").append(vuelta.getGolesVisitante()).append("\n");
-
-            int gA = ida.getGolesLocal()     + vuelta.getGolesVisitante();
+            sb.append("\n [VTA] ").append(vuelta.getGolesLocal()).append(" - ").append(vuelta.getGolesVisitante());
+            int gA = ida.getGolesLocal() + vuelta.getGolesVisitante();
             int gB = ida.getGolesVisitante() + vuelta.getGolesLocal();
-            sb.append("  Global: ").append(gA).append(" - ").append(gB).append("\n");
-        }
-        if (ganador != null) {
-            sb.append("  ✅ CLASIFICADO: ").append(ganador.getNombre()).append("\n");
+            sb.append(" (Global: ").append(gA).append("-").append(gB).append(")");
         }
         return sb.toString();
     }
 
-    // ── Getters ───────────────────────────────────────────────────────────
+    // --- ACCESORES DE ESTADO ---
     public Equipo  getEquipoA()      { return equipoA; }
     public Equipo  getEquipoB()      { return equipoB; }
     public Partido getIda()          { return ida; }
     public Partido getVuelta()       { return vuelta; }
     public Equipo  getGanador()      { return ganador; }
     public boolean isDoblePartido()  { return doblePartido; }
+    
     public boolean isCompleta() {
         if (!doblePartido) return ida != null && ida.isTerminado();
-        return vuelta != null && vuelta.isTerminado();
+        return (vuelta != null && vuelta.isTerminado()) || (ganador != null);
     }
 
-    public void setIda(Partido p)    { this.ida = p; }
-    public void setVuelta(Partido p) { this.vuelta = p; }
-    public void setGanador(Equipo e) { this.ganador = e; }
+    /**
+     * Verifica si un equipo participa en esta llave.
+     */
+    public boolean esMiPartido(Equipo e) {
+        if (e == null) return false;
+        return equipoA.getNombre().equals(e.getNombre()) || equipoB.getNombre().equals(e.getNombre());
+    }
 }
