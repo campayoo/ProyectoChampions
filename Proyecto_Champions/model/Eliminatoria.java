@@ -52,8 +52,10 @@ public class Eliminatoria implements Serializable {
     /** Ejecuta el partido de ida de forma automatizada (IA vs IA). */
     public void jugarIdaAuto() {
         if (ida == null) {
+            System.out.println("[DEBUG - Eliminatoria] Simulando IDA automática: " + equipoA.getNombre() + " vs " + equipoB.getNombre());
             ida = new Partido(equipoA, equipoB);
             ida.simular();
+            System.out.println("   -> Resultado IDA: " + ida.getGolesLocal() + " - " + ida.getGolesVisitante());
         }
     }
 
@@ -67,8 +69,10 @@ public class Eliminatoria implements Serializable {
             return;
         }
         if (vuelta == null) {
+            System.out.println("[DEBUG - Eliminatoria] Simulando VUELTA automática: " + equipoB.getNombre() + " vs " + equipoA.getNombre());
             vuelta = new Partido(equipoB, equipoA);
             vuelta.simular();
+            System.out.println("   -> Resultado VUELTA: " + vuelta.getGolesLocal() + " - " + vuelta.getGolesVisitante());
         }
         determinarGanador();
     }
@@ -86,6 +90,7 @@ public class Eliminatoria implements Serializable {
         if (!doblePartido) {
             if (ida != null && ida.isTerminado()) {
                 ganador = ida.getGanador();
+                System.out.println("[DEBUG - Eliminatoria] Final resuelta. Ganador: " + (ganador != null ? ganador.getNombre() : "Empate"));
             }
             return;
         }
@@ -97,9 +102,18 @@ public class Eliminatoria implements Serializable {
         int golesA = ida.getGolesLocal()     + vuelta.getGolesVisitante();
         int golesB = ida.getGolesVisitante() + vuelta.getGolesLocal();
 
-        if (golesA > golesB)      ganador = equipoA;
-        else if (golesB > golesA) ganador = equipoB;
-        else                      ganador = null; // Empate global → penaltis
+        System.out.println("[DEBUG - Eliminatoria] Evaluando global: " + equipoA.getNombre() + " [" + golesA + "] vs [" + golesB + "] " + equipoB.getNombre());
+
+        if (golesA > golesB) {
+            ganador = equipoA;
+            System.out.println("   -> CLASIFICADO: " + equipoA.getNombre());
+        } else if (golesB > golesA) {
+            ganador = equipoB;
+            System.out.println("   -> CLASIFICADO: " + equipoB.getNombre());
+        } else {
+            ganador = null; // Empate global → penaltis
+            System.out.println("   -> EMPATE GLOBAL. Requiere penaltis.");
+        }
     }
 
     /**
@@ -109,6 +123,7 @@ public class Eliminatoria implements Serializable {
     public void resolverEmpateIA() {
         if (ganador != null) return;
         
+        System.out.println("[DEBUG - Eliminatoria] Ejecutando tanda de penaltis automática...");
         Partido p = doblePartido ? vuelta : ida;
         if (p == null) return;
         
@@ -117,6 +132,7 @@ public class Eliminatoria implements Serializable {
             p.simularSiguienteRondaPenal();
         }
         ganador = p.getGanador();
+        System.out.println("[DEBUG - Eliminatoria] Penaltis finalizados. Ganador: " + ganador.getNombre() + " (" + p.getPenaltisLocal() + "-" + p.getPenaltisVisitante() + ")");
     }
 
     /**

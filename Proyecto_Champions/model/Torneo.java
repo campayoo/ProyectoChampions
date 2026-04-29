@@ -45,6 +45,7 @@ public class Torneo implements Serializable {
      * @param nombre Nombre del torneo (e.g., "UEFA CHAMPIONS LEAGUE").
      */
     public Torneo(String nombre) {
+        System.out.println("[DEBUG - Torneo] Inicializando torneo: " + nombre);
         this.nombre            = nombre;
         this.equipos           = new ArrayList<>();
         this.equiposEliminados = new ArrayList<>();
@@ -65,6 +66,7 @@ public class Torneo implements Serializable {
      * @param equipo Equipo a inscribir en el torneo.
      */
     public void agregarEquipo(Equipo equipo) {
+        System.out.println("[DEBUG - Torneo] Inscribiendo equipo: " + equipo.getNombre());
         equipos.add(equipo);
         for (Jugador j : equipo.getPlantilla()) {
             if (!idsRegistrados.add(j.getId())) {
@@ -89,13 +91,16 @@ public class Torneo implements Serializable {
      * En la Gran Final se usa partido único; en fases previas, Ida/Vuelta.
      */
     public void generarCruces() {
+        System.out.println("\n[DEBUG - Torneo] Generando cruces para la ronda: " + getNombreRonda());
         eliminatorias.clear();
         ArrayList<Equipo> bombos = new ArrayList<>(equipos);
         Collections.shuffle(bombos);
 
         boolean esFinal = (rondaActual == 3);
         for (int i = 0; i + 1 < bombos.size(); i += 2) {
-            eliminatorias.add(new Eliminatoria(bombos.get(i), bombos.get(i + 1), !esFinal));
+            Eliminatoria elim = new Eliminatoria(bombos.get(i), bombos.get(i + 1), !esFinal);
+            eliminatorias.add(elim);
+            System.out.println("   -> Cruce generado: " + elim.getEquipoA().getNombre() + " vs " + elim.getEquipoB().getNombre());
         }
     }
 
@@ -104,8 +109,14 @@ public class Torneo implements Serializable {
      * @param clasificados Lista de equipos que avanzan a la siguiente fase.
      */
     public void avanzarRonda(ArrayList<Equipo> clasificados) {
+        System.out.println("\n[DEBUG - Torneo] Avanzando de ronda. Equipos clasificados: " + clasificados.size());
         for (Equipo e : equipos) {
-            if (!clasificados.contains(e)) equiposEliminados.add(e);
+            if (!clasificados.contains(e)) {
+                equiposEliminados.add(e);
+                System.out.println("   ❌ Eliminado: " + e.getNombre());
+            } else {
+                System.out.println("   ✅ Avanza: " + e.getNombre());
+            }
         }
         equipos.clear();
         equipos.addAll(clasificados);
@@ -144,9 +155,20 @@ public class Torneo implements Serializable {
      * Se reconstruye completamente para que el orden sea correcto.
      */
     public void refrescarGoleadores() {
+        System.out.println("\n[DEBUG - Torneo] Refrescando y reordenando el TreeSet de Goleadores...");
         tableroGoleadores.clear();
         for (Equipo e : equipos)           tableroGoleadores.addAll(e.getPlantilla());
         for (Equipo e : equiposEliminados) tableroGoleadores.addAll(e.getPlantilla());
+        
+        System.out.println("[DEBUG - Torneo] Estado actual del TOP 5 Goleadores (TreeSet ordenado por Comparable):");
+        int count = 1;
+        for (Jugador j : tableroGoleadores) {
+            if (j.getGoles() > 0) {
+                System.out.println("   #" + count + " " + j.getNombre() + " - " + j.getGoles() + " goles (Media: " + j.getMediaGeneral() + ")");
+                count++;
+                if (count > 5) break;
+            }
+        }
     }
 
     // ---------------------------------------------------------------------
