@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://upload.wikimedia.org/wikipedia/en/b/bf/UEFA_Champions_League_logo_2.svg" height="90" alt="UCL Logo"/>
+<img src="https://upload.wikimedia.org/wikipedia/en/b/bf/UEFA_Champions_League_logo_2.svg" height="110" alt="UEFA Champions League Logo"/>
 
 # ⚽ Proyecto Champions Elite
 
