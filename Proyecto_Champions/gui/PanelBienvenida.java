@@ -1,6 +1,7 @@
 package gui;
 
 import data.LectorDatos;
+import data.GestorFicheros;
 import model.Equipo;
 import javax.swing.*;
 import java.awt.*;
@@ -18,6 +19,7 @@ import static gui.UCLTheme.*;
  * - Un motor de partículas que simula un campo estelar con paralaje.
  * - Estética UCL (Dorado, Azul Eléctrico y Marino).
  * - Selección intuitiva de club con previsualización financiera.
+ * - Carga de partidas guardadas.
  */
 public class PanelBienvenida extends JPanel {
 
@@ -44,7 +46,7 @@ public class PanelBienvenida extends JPanel {
     public PanelBienvenida(MainFrame frame) throws IOException {
         this.frame = frame;
         setLayout(new BorderLayout(0, 0));
-        setOpaque(true);
+        setOpaque(true); // Requerido para pintar el fondo completamente
         setBackground(DEEP_BLUE);
 
         // Inicializar coordenadas aleatorias de las estrellas
@@ -73,6 +75,8 @@ public class PanelBienvenida extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
+        super.paintComponent(g); 
+        
         Graphics2D g2 = (Graphics2D) g.create();
         int w = getWidth(), h = getHeight();
 
@@ -100,16 +104,13 @@ public class PanelBienvenida extends JPanel {
             g2.fill(new Ellipse2D.Float(bx - ss[i]/2, by - ss[i]/2, ss[i], ss[i]));
         }
 
-        g2.dispose();
-        super.paintComponent(g);
-
-        // 4. Capa: Efecto de fundido a negro (Inicio de ejecución)
+        // 4. Capa: Efecto de fundido a negro (Intro)
         if (introAlpha > 0f) {
-            Graphics2D g3 = (Graphics2D) g.create();
-            g3.setColor(new Color(0, 0, 0, (int)(introAlpha * 255)));
-            g3.fillRect(0, 0, w, h);
-            g3.dispose();
+            g2.setColor(new Color(0, 0, 0, (int)(introAlpha * 255)));
+            g2.fillRect(0, 0, w, h);
         }
+
+        g2.dispose();
     }
 
     /**
@@ -130,8 +131,6 @@ public class PanelBienvenida extends JPanel {
     // ---------------------------------------------------------------------
 
     private void construirUI() throws IOException {
-        setOpaque(false); // Permite ver el renderizado del paintComponent
-
         // --- SUB-BLOQUE: Cabecera Logotipo ---
         JPanel header = new JPanel();
         header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
@@ -139,13 +138,13 @@ public class PanelBienvenida extends JPanel {
         header.setBorder(BorderFactory.createEmptyBorder(40, 0, 20, 0));
 
         JLabel titulo = new JLabel("CHAMPIONS MANAGER Elite", SwingConstants.CENTER);
-        titulo.setFont(new Font("SansSerif", Font.BOLD, 42));
+        titulo.setFont(fontTitle(48));
         titulo.setForeground(UCL_GOLD);
         titulo.setAlignmentX(CENTER_ALIGNMENT);
 
         JLabel subtitulo = new JLabel("FORJA TU DINASTÍA EN EL FÚTBOL EUROPEO", SwingConstants.CENTER);
-        subtitulo.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        subtitulo.setForeground(Color.LIGHT_GRAY);
+        subtitulo.setFont(fontBody(16));
+        subtitulo.setForeground(GRIS_CLARO);
         subtitulo.setAlignmentX(CENTER_ALIGNMENT);
 
         header.add(titulo);
@@ -160,48 +159,74 @@ public class PanelBienvenida extends JPanel {
         }
 
         listaEquipos = new JList<>(modelo);
-        listaEquipos.setBackground(new Color(8, 18, 48, 200));
-        listaEquipos.setForeground(Color.WHITE);
-        listaEquipos.setFixedCellHeight(35);
-        listaEquipos.setFont(fontBody(13));
+        styleList(listaEquipos);
+        listaEquipos.setFixedCellHeight(40);
         listaEquipos.setSelectedIndex(0);
 
         // Actualización dinámica de la ficha del club
         listaEquipos.addListSelectionListener(e -> {
             int idx = listaEquipos.getSelectedIndex();
-            if (idx >= 0) actualizarInfo(equipos.get(idx));
+            if (idx >= 0) {
+                actualizarInfo(equipos.get(idx));
+                repaint(); // Forzar repintado para evitar artefactos visuales
+            }
         });
 
         JScrollPane scroll = new JScrollPane(listaEquipos);
-        scroll.setBorder(BorderFactory.createLineBorder(UCL_BLUE, 1));
+        styleScrollBar(scroll);
+        scroll.setBorder(BorderFactory.createLineBorder(new Color(255,255,255,30), 1));
 
         // --- SUB-BLOQUE: Informe de Análisis del Club ---
-        txtInfo = new JTextArea(5, 0);
+        txtInfo = new JTextArea(6, 0);
         txtInfo.setEditable(false);
-        txtInfo.setFont(fontMono(12));
-        txtInfo.setBackground(new Color(6, 14, 38, 180));
-        txtInfo.setForeground(Color.CYAN);
+        txtInfo.setFont(fontMono(14));
+        txtInfo.setOpaque(false);
+        txtInfo.setForeground(UCL_BLUE_LT);
         txtInfo.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        
+        // CORRECCIÓN: Para evitar la corrupción de repintado al usar colores con canal alpha
+        // (setOpaque(true) con alpha es problemático en Swing)
+        JPanel wrapInfo = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.setColor(new Color(0, 0, 0, 120));
+                g.fillRect(0, 0, getWidth(), getHeight());
+                super.paintComponent(g);
+            }
+        };
+        wrapInfo.setOpaque(false); 
+        wrapInfo.setPreferredSize(new Dimension(800, 160)); // Tamaño FIJO para estabilidad
+        wrapInfo.add(txtInfo, BorderLayout.CENTER);
+        
         actualizarInfo(equipos.get(0));
 
-        // --- SUB-BLOQUE: Control de Inicio ---
+        // --- SUB-BLOQUE: Control de Inicio y Carga ---
         JButton btnIniciar = uclButton("⚽ EMPEZAR CARRERA", UCL_BLUE);
         btnIniciar.addActionListener(e -> iniciarJuego());
 
-        JPanel panelBotones = new JPanel(new FlowLayout());
+        JButton btnCargar = uclButton("📂 CARGAR PARTIDA", VERDE);
+        btnCargar.setEnabled(GestorFicheros.existePartidaGuardada());
+        btnCargar.addActionListener(e -> frame.cargarPartida());
+
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         panelBotones.setOpaque(false);
         panelBotones.add(btnIniciar);
+        panelBotones.add(btnCargar);
 
         // Asamblea de contenedores
-        JPanel centro = new JPanel(new BorderLayout(0, 15));
-        centro.setOpaque(false);
-        centro.setBorder(BorderFactory.createEmptyBorder(10, 100, 20, 100));
+        JPanel centro = glassPanel(new BorderLayout(0, 15));
+        centro.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
         centro.add(scroll, BorderLayout.CENTER);
-        centro.add(txtInfo, BorderLayout.SOUTH);
+        centro.add(wrapInfo, BorderLayout.SOUTH);
+
+        JPanel mainWrapper = new JPanel(new BorderLayout(0, 30));
+        mainWrapper.setOpaque(false);
+        mainWrapper.setBorder(BorderFactory.createEmptyBorder(10, 150, 40, 150));
+        mainWrapper.add(centro, BorderLayout.CENTER);
+        mainWrapper.add(panelBotones, BorderLayout.SOUTH);
 
         add(header, BorderLayout.NORTH);
-        add(centro, BorderLayout.CENTER);
-        add(panelBotones, BorderLayout.SOUTH);
+        add(mainWrapper, BorderLayout.CENTER);
     }
 
     /**

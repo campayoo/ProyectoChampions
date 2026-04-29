@@ -11,6 +11,8 @@ import java.awt.geom.*;
 import java.util.*;
 import java.util.List;
 
+import static gui.UCLTheme.*;
+
 /**
  * Clase PanelCampo: Lienzo interactivo del terreno de juego.
  * 
@@ -23,15 +25,14 @@ import java.util.List;
 public class PanelCampo extends JPanel {
 
     // --- BLOQUE: PALETA DE COLORES TÁCTICA ---
-    private static final Color BG_FIELD_TOP    = new Color(5,  10,  35);
-    private static final Color BG_FIELD_BTM    = new Color(8,  30,  65);
-    private static final Color CESPED_1        = new Color(26, 84,  50);
-    private static final Color CESPED_2        = new Color(22, 72,  44);
-    private static final Color LINEAS_CAMPO    = new Color(255, 255, 255, 70);
-    private static final Color UCL_GOLD        = new Color(255, 210, 0);
-    private static final Color OVR_NATURAL     = new Color(0,   230, 100);
-    private static final Color OVR_AFIN        = new Color(255, 160, 30);
-    private static final Color OVR_OPUESTA     = new Color(255, 30,  50);
+    private static final Color BG_FIELD_TOP    = DEEP_BLUE;
+    private static final Color BG_FIELD_BTM    = ROYAL_BLUE;
+    private static final Color CESPED_1        = new Color(20, 70,  40);
+    private static final Color CESPED_2        = new Color(15, 60,  35);
+    private static final Color LINEAS_CAMPO    = new Color(255, 255, 255, 60);
+    private static final Color OVR_NATURAL     = VERDE;
+    private static final Color OVR_AFIN        = NARANJA;
+    private static final Color OVR_OPUESTA     = ROJO;
 
     // --- BLOQUE: ESTADO INTERNO Y GESTIÓN DE NODOS ---
     private Equipo                equipo;
@@ -118,17 +119,42 @@ public class PanelCampo extends JPanel {
 
     private void generarNodosFormacion(String f) {
         nodos.clear();
-        nodos.add(new NodoPosicion("POR", 50, 88)); // Arquero
+        nodos.add(new NodoPosicion("POR", 50, 85)); // Arquero
         int[] cuotas = parseFormacion(f);
-        generarLinea(cuotas[1], 70, "DEF"); // Zaga
-        generarLinea(cuotas[2], 45, "MED"); // Medular
-        generarLinea(cuotas[3], 20, "DEL"); // Vanguardia
+
+        // 1. Línea Defensiva
+        generarLinea(cuotas[1], 70, new String[]{"LD", "DFC", "DFC", "LI"});
+        
+        // 2. Línea Medular
+        generarLinea(cuotas[2], 45, new String[]{"MD", "MC", "MC", "MI"});
+        
+        // 3. Línea de Ataque
+        generarLinea(cuotas[3], 20, new String[]{"ED", "DC", "DC", "EI"});
     }
 
-    private void generarLinea(int num, int y, String label) {
+    private void generarLinea(int num, int y, String[] labelsBase) {
+        if (num <= 0) return;
+        // Seleccionamos las etiquetas según el número solicitado
+        String[] finales = new String[num];
+        if (num == 1) {
+            finales[0] = labelsBase[1]; // Central/Medio
+        } else if (num == 2) {
+            finales[0] = labelsBase[1]; finales[1] = labelsBase[2];
+        } else if (num == 3) {
+            finales[0] = labelsBase[0]; finales[1] = labelsBase[1]; finales[2] = labelsBase[3];
+        } else if (num == 4) {
+            finales = labelsBase;
+        } else {
+            // Para 5 o más, repetimos centrales
+            finales[0] = labelsBase[0];
+            finales[num-1] = labelsBase[3];
+            for(int i=1; i<num-1; i++) finales[i] = labelsBase[1];
+        }
+
+        // Distribución X (15% a 85% del ancho)
         for (int i = 0; i < num; i++) {
-            int x = (int)(15 + (70.0 / Math.max(1, num - 1)) * i);
-            nodos.add(new NodoPosicion(label, x, y));
+            double x = (num == 1) ? 50 : 15 + (70.0 / (num - 1)) * i;
+            nodos.add(new NodoPosicion(finales[i], (int)x, y));
         }
     }
 
@@ -156,7 +182,7 @@ public class PanelCampo extends JPanel {
             public void mouseReleased(MouseEvent e) {
                 // Bloque: Resolución del destino del jugador
                 if (arrastrando != null) {
-                    NodoPosicion dest = getNodoCercano(e.getX(), e.getY(), 55);
+                    NodoPosicion dest = getNodoCercano(e.getX(), e.getY(), 65);
                     procesarIntercambio(dest);
                     arrastrando = null;
                     dragPoint = null;
@@ -187,8 +213,15 @@ public class PanelCampo extends JPanel {
 
         if (suplentes.contains(jEntra)) {
             // Acción: Sustitución (Cambio Suplente -> Titular)
-            if (equipo.realizarCambio(jSale, jEntra)) {
+            if (jSale != null) {
+                if (equipo.realizarCambio(jSale, jEntra)) {
+                    jEntra.setPosicionNodo(destino.etiqueta);
+                }
+            } else {
+                // Si el slot estaba vacío, simplemente lo movemos a titulares
+                jEntra.setTitular(true);
                 jEntra.setPosicionNodo(destino.etiqueta);
+                equipo.getTitulares().add(jEntra);
             }
         } else {
             // Acción: Movimiento Táctico (Reubicación interna)
@@ -251,13 +284,30 @@ public class PanelCampo extends JPanel {
         g2.setColor(LINEAS_CAMPO);
         g2.drawRect(20, 20, w - 40, h - 40);
         g2.drawOval(w/2-60, h/2-60, 120, 120);
+
+        // Líneas Divisorias de Bloques (Tácticas)
+        float[] dash1 = {10.0f};
+        g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f));
+        g2.setColor(new Color(255, 255, 255, 30));
+        
+        int hDef = (int)(h * 0.77); // Límite defensa
+        int hMed = (int)(h * 0.52); // Límite medios
+        int hDel = (int)(h * 0.27); // Límite ataque
+
+        g2.drawLine(20, hDef, w - 20, hDef);
+        g2.drawLine(20, hMed, w - 20, hMed);
+        g2.drawLine(20, hDel, w - 20, hDel);
     }
 
     private void dibujarBanquillo(Graphics2D g2, int w, int h) {
         int y = h - 130;
-        g2.setColor(new Color(10, 20, 45, 235));
+        
+        // Efecto de cristal para el banquillo
+        g2.setPaint(new LinearGradientPaint(0, y, 0, h, new float[]{0f, 1f}, new Color[]{new Color(5, 15, 45, 220), new Color(0, 5, 20, 250)}));
         g2.fillRect(0, y, w, 130);
-        g2.setColor(UCL_GOLD);
+        
+        g2.setColor(UCL_BLUE);
+        g2.setStroke(new BasicStroke(2));
         g2.drawLine(0, y, w, y); // Separador táctico
         
         int x = 50;
@@ -270,33 +320,36 @@ public class PanelCampo extends JPanel {
     }
 
     private void dibujarCarta(Graphics2D g2, int x, int y, Jugador j, boolean sel, String tag) {
-        // Bloque: Color perimetral según compatibilidad
         Color cOvr = getColorOvr(j.getCompatibilidadConNodo(tag));
         
-        if (sel) { // Efecto de aura dorada si está seleccionado
-            g2.setColor(new Color(255, 210, 0, 120));
-            g2.fillOval(x - 26, y - 26, 52, 52);
+        if (sel) {
+            g2.setPaint(new RadialGradientPaint(x, y, 40, new float[]{0f, 1f}, new Color[]{new Color(UCL_GOLD.getRed(), UCL_GOLD.getGreen(), UCL_GOLD.getBlue(), 100), new Color(0,0,0,0)}));
+            g2.fillOval(x - 40, y - 40, 80, 80);
         }
 
-        g2.setColor(Color.WHITE);
-        g2.fillOval(x - 20, y - 20, 40, 40);
+        // Cuerpo de la carta (Hexágono o círculo estilizado)
+        g2.setPaint(new LinearGradientPaint(x-22, y-22, x+22, y+22, new float[]{0f, 1f}, new Color[]{new Color(255,255,255,250), new Color(220,230,255)}));
+        g2.fillOval(x - 22, y - 22, 44, 44);
+        
         g2.setColor(cOvr);
-        g2.setStroke(new BasicStroke(3));
-        g2.drawOval(x - 20, y - 20, 40, 40);
+        g2.setStroke(new BasicStroke(2.5f));
+        g2.drawOval(x - 22, y - 22, 44, 44);
 
-        // Bloque: Valoración (OVR)
-        g2.setColor(Color.BLACK);
-        g2.setFont(new Font("SansSerif", Font.BOLD, 14));
+        // Valoración
+        g2.setColor(new Color(0, 10, 40));
+        g2.setFont(fontTitle(16));
         String ovr = String.valueOf(j.getOvrEnPosicion());
-        g2.drawString(ovr, x - g2.getFontMetrics().stringWidth(ovr)/2, y + 5);
+        g2.drawString(ovr, x - g2.getFontMetrics().stringWidth(ovr)/2, y + 6);
 
-        // Bloque: Identificador (Nombre corto)
-        g2.setColor(new Color(0, 0, 0, 180));
-        g2.fillRoundRect(x - 25, y + 25, 50, 14, 5, 5);
+        // Nombre con fondo premium
+        g2.setPaint(new LinearGradientPaint(x-30, y+25, x+30, y+25, new float[]{0f, 0.5f, 1f}, new Color[]{new Color(0,0,0,0), new Color(0,0,0,180), new Color(0,0,0,0)}));
+        g2.fillRect(x - 40, y + 27, 80, 16);
+        
         g2.setColor(Color.WHITE);
-        g2.setFont(new Font("SansSerif", Font.BOLD, 10));
-        String nom = j.getNombre().substring(0, Math.min(8, j.getNombre().length()));
-        g2.drawString(nom, x - g2.getFontMetrics().stringWidth(nom)/2, y + 36);
+        g2.setFont(fontBody(11));
+        String nom = j.getNombre().toUpperCase();
+        if (nom.length() > 10) nom = nom.substring(0, 9) + ".";
+        g2.drawString(nom, x - g2.getFontMetrics().stringWidth(nom)/2, y + 39);
     }
 
     private void dibujarSlotVacio(Graphics2D g2, int x, int y, boolean hover, String tag) {
@@ -342,11 +395,14 @@ public class PanelCampo extends JPanel {
     }
 
     private Color getColorOvr(Compatibilidad c) {
-        return switch (c) {
-            case NATURAL -> OVR_NATURAL;
-            case AFIN    -> OVR_AFIN;
-            default      -> OVR_OPUESTA;
-        };
+        switch (c) {
+            case NATURAL:
+                return OVR_NATURAL;
+            case AFIN:
+                return OVR_AFIN;
+            default:
+                return OVR_OPUESTA;
+        }
     }
 
     private void setSeleccionado(Jugador j) { this.seleccionado = j; }

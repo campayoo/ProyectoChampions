@@ -1,24 +1,39 @@
 package model;
 
-/**
- * Clase Entrenador: Representa la identidad del estratega en el banquillo.
- * 
- * Modela al Mánager del equipo, cuya veteranía y filosofía táctica aplican
- * modificadores directos sobre el desempeño de los jugadores durante la simulación.
- * 
- * INFLUENCIA TÉCNICA:
- * - Bonificación por Experiencia (Cohesión de grupo).
- * - Multiplicadores de Estilo (Especialización Ofensiva/Defensiva).
- */
-public class Entrenador extends Persona {
+import java.io.Serializable;
 
-    // --- BLOQUE: PERFIL TÉCNICO ---
-    private String estilo;            // Filosofía (e.g., "Tiki-Taka", "Catenaccio")
-    private int    experiencia;       // Años de carrera profesional
-    private String formacionFavorita; // Dibujo táctico predilecto (e.g., "4-3-3")
+/**
+ * Clase Entrenador: Representa al Director Técnico del equipo.
+ *
+ * Modela al mánager cuya veteranía y filosofía táctica aplican
+ * modificadores directos sobre el desempeño durante la simulación.
+ *
+ * Implementa {@link Serializable} para persistencia con ObjectOutputStream.
+ */
+public class Entrenador extends Persona implements Serializable {
+
+    /** Versión de serialización para compatibilidad de ficheros. */
+    private static final long serialVersionUID = 3L;
+
+    /** Filosofía táctica (e.g., "OFENSIVO", "DEFENSIVO", "EQUILIBRADO"). */
+    private String estilo;
+
+    /** Años de carrera profesional como entrenador. */
+    private int    experiencia;
+
+    /** Dibujo táctico predilecto (e.g., "4-3-3", "3-5-2"). */
+    private String formacionFavorita;
 
     /**
-     * Constructor: Define la identidad y el CV del nuevo preparador.
+     * Constructor: Define la identidad y el CV del preparador.
+     *
+     * @param id                Identificador único.
+     * @param nombre            Nombre completo.
+     * @param edad              Edad biológica.
+     * @param nacionalidad      País de origen.
+     * @param estilo            Filosofía táctica.
+     * @param experiencia       Años de experiencia.
+     * @param formacionFavorita Esquema táctico predilecto.
      */
     public Entrenador(int id, String nombre, int edad, String nacionalidad,
                        String estilo, int experiencia, String formacionFavorita) {
@@ -28,49 +43,45 @@ public class Entrenador extends Persona {
         this.formacionFavorita = formacionFavorita;
     }
 
+    /** @return Siempre "Director Técnico". */
     @Override
     public String getRol() { return "Director Técnico"; }
 
-    // ---------------------------------------------------------------------
-    // BLOQUE: ALGORITMOS DE BONIFICACIÓN ESTRATÉGICA
-    // ---------------------------------------------------------------------
-
     /**
-     * Calcula el factor de 'oficio' basado en la veteranía del técnico.
-     * @return Multiplicador de cohesión (Max 1.25).
+     * Factor de cohesión basado en veteranía. Máx 1.25 (+25%).
+     * @return Multiplicador táctico (1.00 - 1.25).
      */
     public double getBonificacionTactica() {
-        // La experiencia mejora el rendimiento colectivo en un 1% anual
         return Math.min(1.25, 1.0 + (experiencia * 0.01));
     }
 
     /**
-     * Determina el peso extra en la zona de ataque según la filosofía del DT.
+     * Multiplicador ofensivo según el estilo del DT.
+     * @return Factor de ataque (0.85 - 1.20).
      */
     public double getMultiplicadorOfensivo() {
         String est = estilo.toUpperCase();
         if (est.contains("OFENSIVO") || est.contains("ATAQUE")) return 1.20;
         if (est.contains("DEFENSIVO")) return 0.85;
-        return 1.00; // Perfil equilibrado
+        return 1.00;
     }
 
     /**
-     * Determina el refuerzo en la muralla defensiva según la filosofía del DT.
+     * Multiplicador defensivo según el estilo del DT.
+     * @return Factor de defensa (0.90 - 1.25).
      */
     public double getMultiplicadorDefensivo() {
         String est = estilo.toUpperCase();
         if (est.contains("DEFENSIVO") || est.contains("MURO")) return 1.25;
         if (est.contains("OFENSIVO")) return 0.90;
-        return 1.00; // Perfil equilibrado
+        return 1.00;
     }
 
-    // --- ACCESORES TÉCNICOS ---
+    // --- Accesores ---
     public String getEstilo()            { return estilo; }
+    public int    getExperiencia()       { return experiencia; }
     public String getFormacionFavorita() { return formacionFavorita; }
 
-    /**
-     * Ficha técnica reducida para listados del staff.
-     */
     @Override
     public String toString() {
         return nombre + " [" + estilo + "] - EXP: " + experiencia + "a";

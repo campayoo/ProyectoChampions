@@ -4,6 +4,7 @@ import model.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
+import static gui.UCLTheme.*;
 
 /**
  * Clase PanelAlineacion: Centro de estrategia táctica del club.
@@ -25,8 +26,6 @@ public class PanelAlineacion extends JPanel {
     // --- Paleta de Colores "Champions Elite" ---
     private static final Color BG_DARK  = new Color(10, 14, 30);
     private static final Color BG_CARD  = new Color(20, 28, 58);
-    private static final Color UCL_BLUE = new Color(0, 100, 255);
-    private static final Color UCL_GOLD = new Color(255, 210, 0);
     private static final Color GRIS     = new Color(160, 175, 210);
 
     // --- Elementos de Interfaz ---
@@ -53,9 +52,7 @@ public class PanelAlineacion extends JPanel {
      */
     private void construirUI() {
         // BLOQUE: Título de Sección
-        JLabel lblTitulo = new JLabel("⚙ Estrategia y Alineación Visual", SwingConstants.LEFT);
-        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 26));
-        lblTitulo.setForeground(UCL_GOLD);
+        JLabel lblTitulo = UCLTheme.glowLabel("⚙  ESTRATEGIA Y DISPOSICIÓN TÁCTICA", UCLTheme.UCL_GOLD, 28, true);
         add(lblTitulo, BorderLayout.NORTH);
 
         // BLOQUE: Cuerpo Central
@@ -65,11 +62,13 @@ public class PanelAlineacion extends JPanel {
         // Sub-Bloque: Panel de Parámetros (Contenedor con Scroll)
         JPanel colIzqContent = new JPanel();
         colIzqContent.setLayout(new BoxLayout(colIzqContent, BoxLayout.Y_AXIS));
-        colIzqContent.setBackground(BG_DARK);
+        colIzqContent.setOpaque(false);
 
         // Bloque: Marco de Configuración Táctica
-        JPanel pnlForm = seccionPanel(" 📋 Configuración ");
-        cmbFormacion = new JComboBox<>(new String[]{"4-4-2", "4-3-3", "3-5-2", "5-3-2", "4-5-1", "3-4-3"});
+        JPanel pnlForm = UCLTheme.glassPanel(new GridLayout(0, 1, 0, 8));
+        pnlForm.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        cmbFormacion = new JComboBox<>(new String[]{"4-4-2", "4-3-3", "3-5-2", "5-3-2", "4-5-1", "3-4-3", "4-2-3-1"});
         cmbFormacion.setSelectedItem(equipo.getFormacion());
         estilizarCombo(cmbFormacion);
         
@@ -89,38 +88,32 @@ public class PanelAlineacion extends JPanel {
         pnlForm.add(cmbTactica);
         
         colIzqContent.add(pnlForm);
-        colIzqContent.add(Box.createVerticalStrut(15));
+        colIzqContent.add(Box.createVerticalStrut(20));
         
         // Bloque: Panel de Gestión Operativa (Botones)
-        JPanel pnlAcciones = seccionPanel(" ⚡ Acciones ");
+        JPanel pnlAcciones = UCLTheme.glassPanel(new GridLayout(0, 1, 0, 12));
+        pnlAcciones.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        JButton btnAuto = UCLTheme.uclButton("🔄 Auto-Alinear Mejores", UCLTheme.UCL_BLUE);
+        JButton btnAuto = UCLTheme.uclButton("AUTO-OPTIMIZAR ONCE", UCLTheme.UCL_BLUE);
         btnAuto.addActionListener(e -> ejecutarAutoAlineacion());
 
-        JButton btnVolver = UCLTheme.uclButton("← Volver", new Color(80, 90, 110));
+        JButton btnVolver = UCLTheme.uclButton("VOLVER AL CLUB", new Color(100, 110, 130));
         btnVolver.addActionListener(e -> volverAlTorneo());
 
-        JButton btnJugar  = UCLTheme.uclButton("⚽ Confirmar Táctica", UCLTheme.VERDE);
+        JButton btnJugar  = UCLTheme.uclButton("CONFIRMAR Y JUGAR", UCLTheme.VERDE);
         btnJugar.addActionListener(e -> guardarYComenzar());
         
+        pnlAcciones.add(glowLabel("COMANDOS TACTICOS", UCLTheme.UCL_MAGENTA, 12, true));
         pnlAcciones.add(btnAuto);
-        pnlAcciones.add(Box.createVerticalStrut(10));
-        
-        // Fila de navegación secundaria
-        JPanel pnlFilaFinal = new JPanel(new GridLayout(1, 2, 10, 0));
-        pnlFilaFinal.setOpaque(false);
-        pnlFilaFinal.add(btnVolver);
-        pnlFilaFinal.add(btnJugar);
-        pnlAcciones.add(pnlFilaFinal);
+        pnlAcciones.add(btnJugar);
+        pnlAcciones.add(btnVolver);
         
         colIzqContent.add(pnlAcciones);
 
         // Integración de Scroll en la columna izquierda
         JScrollPane scrollIzq = new JScrollPane(colIzqContent);
-        scrollIzq.setBorder(null);
-        scrollIzq.setOpaque(false);
-        scrollIzq.getViewport().setOpaque(false);
-        scrollIzq.setPreferredSize(new Dimension(340, 0));
+        UCLTheme.styleScrollBar(scrollIzq);
+        scrollIzq.setPreferredSize(new Dimension(360, 0));
 
         // Sub-Bloque: Representación del Terreno de Juego (Derecha)
         panelCampo = new PanelCampo(equipo, j -> {
@@ -168,9 +161,27 @@ public class PanelAlineacion extends JPanel {
      */
     private void guardarYComenzar() {
         if (frame.getEliminatoriaActual() == null) return;
+        
+        // Validación: Asegurar que el club tiene 11 gladiadores en el campo
+        if (equipo.getTitulares().size() < 11) {
+            int resp = JOptionPane.showConfirmDialog(this, 
+                "⚠️ Tu equipo no tiene 11 titulares asignados.\n¿Deseas que el sistema complete la alineación automáticamente?",
+                "VALIDACIÓN TÁCTICA", JOptionPane.YES_NO_OPTION);
+            
+            if (resp == JOptionPane.YES_OPTION) {
+                ejecutarAutoAlineacion();
+            } else {
+                return;
+            }
+        }
+
         equipo.setFormacion(cmbFormacion.getSelectedItem().toString());
         equipo.setTactica(cmbTactica.getSelectedItem().toString());
-        try { frame.mostrarPantalla(MainFrame.PANTALLA_PARTIDO); } catch (Exception ignored) {}
+        
+        try { 
+            frame.setEstado("🚀 ¡Saliendo al túnel de vestuarios!");
+            frame.mostrarPantalla(MainFrame.PANTALLA_PARTIDO); 
+        } catch (Exception ignored) {}
     }
 
     /**
@@ -192,9 +203,9 @@ public class PanelAlineacion extends JPanel {
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         p.setBackground(BG_CARD);
         p.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(UCL_BLUE), titulo,
+            BorderFactory.createLineBorder(UCLTheme.UCL_BLUE), titulo,
             TitledBorder.LEFT, TitledBorder.TOP,
-            new Font("SansSerif", Font.BOLD, 13), UCL_GOLD));
+            new Font("SansSerif", Font.BOLD, 13), UCLTheme.UCL_GOLD));
         return p;
     }
 

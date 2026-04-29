@@ -19,22 +19,23 @@ public final class UCLTheme {
     // ---------------------------------------------------------------------
     // BLOQUE: PALETA DE COLORES CORPORATIVA
     // ---------------------------------------------------------------------
-    public static final Color DEEP_BLUE    = new Color(0,   24,  55);    // Fondo base estadio
-    public static final Color ROYAL_BLUE   = new Color(1,   14,  31);    // Oscuros de viñeta
-    public static final Color UCL_BLUE     = new Color(0,   100, 255);   // Azul eléctrico UCL
-    public static final Color UCL_BLUE_LT  = new Color(30,  130, 255);   // Iluminación neón
-    public static final Color UCL_SILVER   = new Color(192, 205, 220);   // Acabado metal
-    public static final Color UCL_GOLD     = new Color(255, 210, 0);     // Color del trofeo
+    public static final Color DEEP_BLUE    = new Color(0,   12,  35);    // Fondo base estadio (Más profundo)
+    public static final Color ROYAL_BLUE   = new Color(5,   25,  60);    // Azul real UCL
+    public static final Color UCL_BLUE     = new Color(30,  100, 255);   // Azul eléctrico UCL
+    public static final Color UCL_BLUE_LT  = new Color(0,   200, 255);   // Cyan neón (Accento)
+    public static final Color UCL_SILVER   = new Color(220, 230, 245);   // Metal refinado
+    public static final Color UCL_GOLD     = new Color(255, 215, 0);     // Oro trofeo brillante
+    public static final Color UCL_MAGENTA  = new Color(230, 0,   120);   // Accento secundario UCL
     
     // Configuración para efectos de cristal (Glassmorphism)
-    public static final Color GLASS_BG     = new Color(15,  25,  60, 190);
-    public static final Color GLASS_BORDER = new Color(255, 255, 255, 60);
+    public static final Color GLASS_BG     = new Color(20,  40,  80, 180);
+    public static final Color GLASS_BORDER = new Color(255, 255, 255, 40);
     
-    // Semántica de estados
-    public static final Color VERDE        = new Color(0,   220, 110);   // Positivo / Clasificado
-    public static final Color ROJO         = new Color(230,  50,  50);   // Negativo / Eliminado
-    public static final Color NARANJA      = new Color(255, 140,   0);   // Alerta
-    public static final Color GRIS_CLARO   = new Color(180, 195, 230);   // Texto informativo
+    // Semántica de estados (Refinados)
+    public static final Color VERDE        = new Color(0,   230, 120);   // Positivo
+    public static final Color ROJO         = new Color(255, 60,  80);    // Negativo
+    public static final Color NARANJA      = new Color(255, 150,  0);    // Advertencia
+    public static final Color GRIS_CLARO   = new Color(170, 190, 220);   // Texto informativo
 
     // ---------------------------------------------------------------------
     // BLOQUE: RECURSOS TIPOGRÁFICOS
@@ -58,19 +59,17 @@ public final class UCLTheme {
                 setBorderPainted(false);
                 setContentAreaFilled(false);
                 setForeground(Color.WHITE);
-                setFont(fontTitle(13));
+                setFont(new Font("Segoe UI", Font.BOLD, 12));
                 setCursor(new Cursor(Cursor.HAND_CURSOR));
-                setBorder(BorderFactory.createEmptyBorder(12, 28, 12, 28));
+                setBorder(BorderFactory.createEmptyBorder(12, 32, 12, 32));
 
-                // Lógica de animación suave para el hover
                 addMouseListener(new MouseAdapter() {
                     @Override public void mouseEntered(MouseEvent e) { animate(true); }
                     @Override public void mouseExited(MouseEvent e) { animate(false); }
-                    
                     private void animate(boolean in) {
                         if (timer != null && timer.isRunning()) timer.stop();
                         timer = new javax.swing.Timer(15, ev -> {
-                            hoverProgress = in ? Math.min(1f, hoverProgress + 0.15f) : Math.max(0f, hoverProgress - 0.15f);
+                            hoverProgress = in ? Math.min(1f, hoverProgress + 0.12f) : Math.max(0f, hoverProgress - 0.12f);
                             if (hoverProgress <= 0 || hoverProgress >= 1) ((javax.swing.Timer)ev.getSource()).stop();
                             repaint();
                         });
@@ -84,27 +83,37 @@ public final class UCLTheme {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
                 int w = getWidth(), h = getHeight();
+                boolean pressed = getModel().isPressed();
                 
-                // Color dinámico según el progreso de la animación
-                int alpha = (int)(200 + (55 * hoverProgress));
-                Color c = new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), alpha);
-                
-                // Dibujo del cuerpo del botón (Redondeado)
-                g2.setPaint(new GradientPaint(0, 0, c, 0, h, c.darker()));
-                g2.fillRoundRect(0, 0, w, h, 8, 8);
-                
-                // Borde brillante
-                g2.setColor(new Color(255, 255, 255, (int)(50 + 70 * hoverProgress)));
-                g2.drawRoundRect(0, 0, w-1, h-1, 8, 8);
+                // Fondo con degradado
+                Color baseColor = pressed ? accent.darker() : accent;
+                GradientPaint gp = new GradientPaint(0, 0, baseColor, 0, h, baseColor.darker());
+                g2.setPaint(gp);
+                g2.fillRoundRect(0, 0, w, h, 12, 12);
 
-                // Dibujado del texto central
+                // Brillo Hover
+                if (hoverProgress > 0) {
+                    g2.setPaint(new Color(255, 255, 255, (int)(40 * hoverProgress)));
+                    g2.fillRoundRect(0, 0, w, h, 12, 12);
+                }
+
+                // Borde
+                g2.setStroke(new BasicStroke(1.5f));
+                g2.setColor(new Color(255, 255, 255, (int)(40 + 60 * hoverProgress)));
+                g2.drawRoundRect(1, 1, w-2, h-2, 12, 12);
+
+                // Texto
                 FontMetrics fm = g2.getFontMetrics();
-                int x = (w - fm.stringWidth(getText())) / 2;
-                int y = (h - fm.getHeight()) / 2 + fm.getAscent();
-                
+                int tx = (w - fm.stringWidth(getText())) / 2;
+                int ty = (h - fm.getHeight()) / 2 + fm.getAscent();
                 g2.setColor(Color.WHITE);
-                g2.drawString(getText(), x, y);
+                g2.drawString(getText(), tx, ty);
                 g2.dispose();
+            }
+
+            @Override public Dimension getPreferredSize() {
+                Dimension d = super.getPreferredSize();
+                return new Dimension(d.width + 10, d.height); // Extra margin
             }
         };
         return btn;
@@ -137,25 +146,49 @@ public final class UCLTheme {
                 // Relleno suave con gradiente para profundidad
                 g2.setPaint(new LinearGradientPaint(0, 0, 0, h, 
                     new float[]{0f, 0.7f, 1f}, 
-                    new Color[]{new Color(25, 40, 85, 200), new Color(15, 25, 60, 220), new Color(5, 10, 30, 240)}));
-                g2.fillRoundRect(0, 0, w, h, 15, 15);
+                    new Color[]{new Color(25, 45, 95, 180), new Color(15, 25, 55, 210), new Color(5, 10, 30, 230)}));
+                g2.fillRoundRect(0, 0, w, h, 20, 20);
                 
                 // Reflejo de brillo superior (Highlight)
-                g2.setPaint(new LinearGradientPaint(0, 0, 0, 25, 
+                g2.setPaint(new LinearGradientPaint(0, 0, w, 40, 
                     new float[]{0f, 1f}, 
-                    new Color[]{new Color(255, 255, 255, 30), new Color(255, 255, 255, 0)}));
-                g2.fillRoundRect(2, 2, w-4, 25, 15, 15);
+                    new Color[]{new Color(255, 255, 255, 25), new Color(255, 255, 255, 0)}));
+                g2.fillRoundRect(2, 2, w-4, 40, 20, 20);
 
-                // Contorno de alta definición con gradiente de luz
+                // Contorno de alta definición
                 g2.setPaint(new LinearGradientPaint(0, 0, w, h, 
                     new float[]{0f, 0.5f, 1f}, 
-                    new Color[]{GLASS_BORDER, new Color(255, 255, 255, 10), GLASS_BORDER}));
+                    new Color[]{new Color(255,255,255,50), new Color(255, 255, 255, 10), new Color(255,255,255,50)}));
                 g2.setStroke(new BasicStroke(1.2f));
-                g2.drawRoundRect(0, 0, w-1, h-1, 15, 15);
+                g2.drawRoundRect(0, 0, w-1, h-1, 20, 20);
                 
                 g2.dispose();
             }
         };
+    }
+
+    /**
+     * Utility: styleScrollBar
+     * Personaliza el aspecto de las barras de scroll para que no desentonen.
+     */
+    public static void styleScrollBar(JScrollPane scroll) {
+        scroll.getVerticalScrollBar().setPreferredSize(new Dimension(8, 0));
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+    }
+
+    /**
+     * Utility: setupTable (para JList)
+     */
+    public static void styleList(JList<?> list) {
+        list.setOpaque(false);
+        list.setBackground(new Color(0,0,0,0));
+        list.setForeground(Color.WHITE);
+        list.setSelectionBackground(new Color(UCL_BLUE.getRed(), UCL_BLUE.getGreen(), UCL_BLUE.getBlue(), 120));
+        list.setSelectionForeground(UCL_GOLD);
+        list.setFont(fontBody(14));
     }
 
     // Constructor privado para evitar instancias de una clase de utilidades

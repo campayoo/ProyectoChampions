@@ -94,7 +94,7 @@ public class PanelTorneo extends JPanel {
         wrapCruces.add(glowLabel("⚽ CUADRO DE ELIMINATORIAS", UCL_BLUE_LT, 12, true), BorderLayout.NORTH);
         wrapCruces.add(panelCruces, BorderLayout.CENTER);
         
-        gbcR.gridy = 0; gbcR.weighty = 0.4; // Menor peso inicial
+        gbcR.gridy = 0; gbcR.weighty = 0.7; // Mayor peso al cuadro de partidos
         panelInfoDerecha.add(wrapCruces, gbcR);
 
         // 3. GOLEADORES (ZONA CON SCROLL)
@@ -103,17 +103,14 @@ public class PanelTorneo extends JPanel {
         panelListaGoleadores.setOpaque(false);
 
         JScrollPane scrollGoleadores = new JScrollPane(panelListaGoleadores);
-        scrollGoleadores.getViewport().setOpaque(false);
-        scrollGoleadores.setOpaque(false);
-        scrollGoleadores.setBorder(null);
-        scrollGoleadores.getVerticalScrollBar().setUnitIncrement(16);
+        styleScrollBar(scrollGoleadores);
 
         JPanel wrapGoleadores = glassPanel(new BorderLayout(0, 10));
         wrapGoleadores.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         wrapGoleadores.add(glowLabel("🔥 MÁXIMOS GOLEADORES", UCL_GOLD, 12, true), BorderLayout.NORTH);
         wrapGoleadores.add(scrollGoleadores, BorderLayout.CENTER);
 
-        gbcR.gridy = 1; gbcR.weighty = 1.0; gbcR.insets = new Insets(15, 0, 0, 0);
+        gbcR.gridy = 1; gbcR.weighty = 0.3; gbcR.insets = new Insets(15, 0, 0, 0);
         panelInfoDerecha.add(wrapGoleadores, gbcR);
 
         gbc.gridx = 1; gbc.weightx = 0.75;
@@ -172,17 +169,19 @@ public class PanelTorneo extends JPanel {
         tp.setEditable(false);
         tp.setOpaque(false);
         
-        String html = String.format("<html><body style='font-family:Segoe UI; color:#B4D2FF; margin:10px;'>"
+        String html = String.format("<html><body style='font-family:Segoe UI; color:#DCE6F5; margin:10px;'>"
             + "<h2 style='color:#FFD700; margin:0;'>%s</h2>"
-            + "<p style='margin:2px 0;'>🌍 Liga: %s</p>"
-            + "<p style='margin:2px 0;'>👥 Plantilla: %d jugadores</p>"
-            + "<hr style='border:0; border-top:1px solid #336699;'>"
-            + "<h4 style='color:#00AAFF; margin:8px 0 2px 0;'>ESTADÍSTICAS</h4>"
-            + "⚽ Favor: <span style='color:#00FF00;'>%d</span><br>"
-            + "🛡 Contra: <span style='color:#FF4444;'>%d</span><br>"
-            + "<hr style='border:0; border-top:1px solid #336699;'>"
-            + "<h2 style='color:#FFF; margin-top:10px;'>%.2f M€</h2>"
-            + "<small style='color:#888;'>PRESUPUESTO TRANSFER</small>"
+            + "<p style='margin:4px 0; color:#80A0FF;'>🌍 Liga: %s</p>"
+            + "<p style='margin:4px 0;'>👥 Plantilla: <b>%d</b> jugadores</p>"
+            + "<div style='background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; margin-top:10px;'>"
+            + "<h4 style='color:#00AAFF; margin:0 0 5px 0;'>ESTADÍSTICAS</h4>"
+            + "<span style='color:#00FF99;'>⚽ Goles a Favor: %d</span><br>"
+            + "<span style='color:#FF4466;'>🛡 Goles en Contra: %d</span>"
+            + "</div>"
+            + "<div style='margin-top:20px; text-align:center;'>"
+            + "<h1 style='color:#FFF; margin:0;'>%.2f M€</h1>"
+            + "<small style='color:#00C0FF; letter-spacing:1px;'>PRESUPUESTO DISPONIBLE</small>"
+            + "</div>"
             + "</body></html>", 
             eq.getNombre(), eq.getPais(), eq.getPlantilla().size(), 
             eq.getGolesAFavor(), eq.getGolesEnContra(), eq.getPresupuesto());
@@ -191,6 +190,21 @@ public class PanelTorneo extends JPanel {
 
         hudEquipo.add(ti, BorderLayout.NORTH);
         hudEquipo.add(tp, BorderLayout.CENTER);
+        
+        JButton btnGestion = uclButton("GESTIONAR CLUB", UCL_BLUE);
+        btnGestion.setFont(fontTitle(10));
+        
+        // Listener para ir al mercado de fichajes y ventas
+        btnGestion.addActionListener(e -> {
+            try {
+                frame.mostrarPantalla(MainFrame.PANTALLA_MERCADO);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        hudEquipo.add(btnGestion, BorderLayout.SOUTH);
+        
         hudEquipo.revalidate();
     }
 
@@ -208,25 +222,49 @@ public class PanelTorneo extends JPanel {
         
         JLabel eqA = new JLabel(elim.getEquipoA().getNombre().toUpperCase());
         eqA.setForeground(Color.WHITE);
-        eqA.setFont(fontTitle(12));
+        eqA.setFont(fontTitle(14));
         
-        JLabel vs = new JLabel("VS");
+        JLabel vs = new JLabel(" VS ");
         vs.setForeground(UCL_GOLD);
-        vs.setFont(fontBody(10));
+        vs.setFont(fontBody(11));
         
         JLabel eqB = new JLabel(elim.getEquipoB().getNombre().toUpperCase());
         eqB.setForeground(Color.WHITE);
-        eqB.setFont(fontTitle(12));
+        eqB.setFont(fontTitle(14));
 
         nombres.add(eqA); nombres.add(vs); nombres.add(eqB);
 
+        boolean esMio = elim.esMiPartido(frame.getTorneo().getEquipoUsuario());
+        if (esMio) {
+            p.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(UCL_GOLD, 1),
+                BorderFactory.createEmptyBorder(5, 15, 5, 15)
+            ));
+            p.setBackground(new Color(255, 215, 0, 15));
+        }
+
         boolean completado = elim.isCompleta();
-        JLabel lblEstado = new JLabel(completado ? "✓ FINALIZADO" : "• EN ESPERA");
-        lblEstado.setForeground(completado ? VERDE : GRIS_CLARO);
-        lblEstado.setFont(fontMono(10));
+        JLabel lblEstadoMatch = new JLabel(completado ? "✓ FINALIZADO" : "• EN ESPERA");
+        lblEstadoMatch.setForeground(completado ? VERDE : GRIS_CLARO);
+        lblEstadoMatch.setFont(fontMono(10));
 
         p.add(nombres, BorderLayout.CENTER);
-        p.add(lblEstado, BorderLayout.EAST);
+        p.add(lblEstadoMatch, BorderLayout.EAST);
+        
+        // Efecto hover sutil para las filas
+        p.addMouseListener(new MouseAdapter() {
+            @Override 
+            public void mouseEntered(MouseEvent e) { 
+                p.setBackground(new Color(255, 255, 255, 10)); 
+                p.repaint(); 
+            }
+            @Override 
+            public void mouseExited(MouseEvent e) { 
+                p.setBackground(esMio ? new Color(255, 215, 0, 15) : new Color(0, 0, 0, 0)); 
+                p.repaint(); 
+            }
+        });
+        
         return p;
     }
 
@@ -266,19 +304,39 @@ public class PanelTorneo extends JPanel {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 25));
         p.setOpaque(false);
 
-        JButton bJ = uclButton("▶ JUGAR PARTIDO", UCL_BLUE);
-        JButton bS = uclButton("⚡ SIMULAR FASE", VERDE);
-        JButton bA = uclButton("📋 ESTRATEGIA", UCL_GOLD);
-        JButton bM = uclButton("💶 MERCADO", NARANJA);
+        JButton bJ = uclButton("JUGAR PARTIDO", UCL_BLUE);
+        JButton bS = uclButton("SIMULAR FASE", VERDE);
+        JButton bA = uclButton("GESTIONAR EQUIPO", UCL_GOLD);
+        JButton bM = uclButton("MERCADO", NARANJA);
+        JButton bG = uclButton("GUARDAR PARTIDA", UCL_BLUE_LT);
 
         bJ.addActionListener(e -> { try { jugarPrimerPartidoPendiente(); } catch (Exception ex) {} });
+        
+        // Simular Fase (Completa todo lo que quede pendiente, incluyendo usuario)
         bS.addActionListener(e -> {
             try {
-                frame.simularRondaIA();
+                String resultados = frame.simularRondaIA();
+                
+                JTextArea area = new JTextArea(resultados);
+                area.setEditable(false);
+                area.setFont(fontMono(13));
+                area.setBackground(new Color(10, 15, 30));
+                area.setForeground(Color.WHITE);
+                area.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+                
+                JScrollPane scrollPane = new JScrollPane(area);
+                scrollPane.setPreferredSize(new Dimension(500, 350));
+                styleScrollBar(scrollPane);
+                
+                JOptionPane.showMessageDialog(this, 
+                    scrollPane, 
+                    "Resultados de la Fase Simulada", JOptionPane.INFORMATION_MESSAGE);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-            actualizarDatos(); });
+            actualizarDatos(); 
+        });
+        
         bA.addActionListener(e -> {
             try {
                 frame.mostrarPantalla(MainFrame.PANTALLA_ALINEACION);
@@ -286,6 +344,7 @@ public class PanelTorneo extends JPanel {
                 throw new RuntimeException(ex);
             }
         });
+        
         bM.addActionListener(e -> {
             try {
                 frame.mostrarPantalla(MainFrame.PANTALLA_MERCADO);
@@ -293,13 +352,19 @@ public class PanelTorneo extends JPanel {
                 throw new RuntimeException(ex);
             }
         });
+        
+        bG.addActionListener(e -> frame.guardarPartida());
 
-        p.add(bJ); p.add(bS); p.add(bA); p.add(bM);
+        p.add(bJ); p.add(bS); p.add(bA); p.add(bM); p.add(bG);
         return p;
     }
 
     private void jugarPrimerPartidoPendiente() throws IOException {
         Torneo t = frame.getTorneo();
+        if (t.isTerminado()) {
+            JOptionPane.showMessageDialog(this, "El torneo ha finalizado.");
+            return;
+        }
         for (Eliminatoria e : t.getEliminatorias()) {
             if (e.esMiPartido(t.getEquipoUsuario()) && !e.isCompleta()) {
                 frame.setEliminatoriaActual(e);
@@ -307,6 +372,6 @@ public class PanelTorneo extends JPanel {
                 return;
             }
         }
-        JOptionPane.showMessageDialog(this, "No hay partidos pendientes para tu equipo.");
+        JOptionPane.showMessageDialog(this, "No hay partidos pendientes para tu equipo.\nUsa 'SIMULAR FASE' para avanzar.");
     }
 }

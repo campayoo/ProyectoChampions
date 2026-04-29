@@ -1,26 +1,43 @@
 package model;
 
+import java.io.Serializable;
+
 /**
  * Clase Eliminatoria: Coordinadora de llaves en el cuadro competitivo.
- * 
+ *
  * Gestiona el enfrentamiento táctico entre dos clubes, controlando el flujo
  * de partidos (Ida/Vuelta), calculando el marcador global y certificando
  * quién es el ganador legítimo para avanzar de ronda.
+ *
+ * Implementa {@link Serializable} para persistencia con ObjectOutputStream.
  */
-public class Eliminatoria {
+public class Eliminatoria implements Serializable {
+
+    /** Versión de serialización para compatibilidad de ficheros. */
+    private static final long serialVersionUID = 6L;
 
     // --- BLOQUE: CONFIGURACIÓN DE LA LLAVE ---
-    private final Equipo equipoA;       // Club con localía en la Ida
-    private final Equipo equipoB;       // Club con localía en la Vuelta
-    private final boolean doblePartido; // Formato: true (Ida/Vta), false (Final única)
+    /** Club con localía en el partido de Ida. */
+    private final Equipo equipoA;
+    /** Club con localía en el partido de Vuelta. */
+    private final Equipo equipoB;
+    /** true = formato Ida/Vuelta; false = partido único (Gran Final). */
+    private final boolean doblePartido;
 
     // --- BLOQUE: REGISTRO DE ENCUENTROS ---
-    private Partido ida;                // Primer round
-    private Partido vuelta;             // Segundo round
-    private Equipo  ganador;            // Club clasificado
+    /** Primer partido de la eliminatoria. */
+    private Partido ida;
+    /** Segundo partido (solo en formato doble). */
+    private Partido vuelta;
+    /** Club clasificado para la siguiente ronda. */
+    private Equipo  ganador;
 
     /**
      * Constructor: Inicializa el marco de la eliminatoria.
+     *
+     * @param equipoA      Equipo con localía en la Ida.
+     * @param equipoB      Equipo con localía en la Vuelta.
+     * @param doblePartido true para Ida/Vuelta, false para partido único.
      */
     public Eliminatoria(Equipo equipoA, Equipo equipoB, boolean doblePartido) {
         this.equipoA      = equipoA;
@@ -32,25 +49,27 @@ public class Eliminatoria {
     // BLOQUE: SIMULACIÓN EN SEGUNDO PLANO (MODO CPU)
     // ---------------------------------------------------------------------
 
-    /**
-     * Ejecuta el partido de ida de forma automatizada (IA vs IA).
-     */
+    /** Ejecuta el partido de ida de forma automatizada (IA vs IA). */
     public void jugarIdaAuto() {
-        ida = new Partido(equipoA, equipoB);
-        ida.simular();
+        if (ida == null) {
+            ida = new Partido(equipoA, equipoB);
+            ida.simular();
+        }
     }
 
     /**
      * Ejecuta el partido de vuelta y actualiza el vencedor por marcador global.
+     * En partidos únicos, simplemente determina el ganador sin crear vuelta.
      */
     public void jugarVueltaAuto() {
-        if (!doblePartido) { 
-            determinarGanador(); 
-            return; 
+        if (!doblePartido) {
+            determinarGanador();
+            return;
         }
-        // Inversión de localía para el segundo encuentro
-        vuelta = new Partido(equipoB, equipoA);
-        vuelta.simular();
+        if (vuelta == null) {
+            vuelta = new Partido(equipoB, equipoA);
+            vuelta.simular();
+        }
         determinarGanador();
     }
 
@@ -60,9 +79,10 @@ public class Eliminatoria {
 
     /**
      * Calcula el equipo clasificado sumando los goles de ambos encuentros.
+     * En caso de empate global, el ganador queda como null (requiere penaltis).
      */
     public void determinarGanador() {
-        // Bloque: Caso de Partido Único (Final UEFA)
+        // Caso de Partido Único (Gran Final)
         if (!doblePartido) {
             if (ida != null && ida.isTerminado()) {
                 ganador = ida.getGanador();
@@ -70,7 +90,7 @@ public class Eliminatoria {
             return;
         }
 
-        // Bloque: Caso de Eliminatoria Doble
+        // Caso de Eliminatoria Doble
         if (ida == null || !ida.isTerminado() || vuelta == null || !vuelta.isTerminado()) return;
 
         // Cómputo global de goles
@@ -79,31 +99,36 @@ public class Eliminatoria {
 
         if (golesA > golesB)      ganador = equipoA;
         else if (golesB > golesA) ganador = equipoB;
-        else                      ganador = null; // Empate global que escala a penaltis
+        else                      ganador = null; // Empate global → penaltis
     }
 
     /**
-     * Algoritmo de resolución para simulaciones rápidas donde no interviene el usuario.
+     * Resolución de empate para simulaciones rápidas de la IA.
+     * Ahora utiliza el sistema real de penaltis en lugar de lanzar la moneda.
      */
     public void resolverEmpateIA() {
         if (ganador != null) return;
-        // En caso de empate técnico total, avanza el club con mejor ratio OVR
-        double poderA = equipoA.getPoderOfensivo() + equipoA.getPoderDefensivo();
-        double poderB = equipoB.getPoderOfensivo() + equipoB.getPoderDefensivo();
-        ganador = (poderA > poderB) ? equipoA : equipoB;
+        
+        Partido p = doblePartido ? vuelta : ida;
+        if (p == null) return;
+        
+        // Simular tanda de penaltis completa
+        while (p.isEnTanda()) {
+            p.simularSiguienteRondaPenal();
+        }
+        ganador = p.getGanador();
     }
 
     /**
-     * Determina si la igualdad en el global exige una tanda de penaltis.
+     * Determina si el empate en el global exige una tanda de penaltis.
+     * @return true si hay empate y se necesita desempate.
      */
     public boolean requierePenaltis() {
-        // Verificación en partido único
         if (!doblePartido) {
-            return ida != null && ida.isTerminado() && ida.getGolesLocal() == ida.getGolesVisitante();
+            return ida != null && ida.isTerminado()
+                && ida.getGolesLocal() == ida.getGolesVisitante();
         }
-        // Verificación en doble partido
         if (ida == null || !ida.isTerminado() || vuelta == null || !vuelta.isTerminado()) return false;
-        
         int golesA = ida.getGolesLocal()     + vuelta.getGolesVisitante();
         int golesB = ida.getGolesVisitante() + vuelta.getGolesLocal();
         return golesA == golesB;
@@ -113,18 +138,21 @@ public class Eliminatoria {
     // BLOQUE: CONTROL DE PARTIDOS JUGABLES (USER MODE)
     // ---------------------------------------------------------------------
 
+    /** Crea y devuelve el partido de ida para modo interactivo. */
     public Partido crearPartidoIda() {
-        ida = new Partido(equipoA, equipoB);
+        if (ida == null) ida = new Partido(equipoA, equipoB);
         return ida;
     }
 
+    /** Crea y devuelve el partido de vuelta para modo interactivo. */
     public Partido crearPartidoVuelta() {
-        vuelta = new Partido(equipoB, equipoA);
+        if (vuelta == null) vuelta = new Partido(equipoB, equipoA);
         return vuelta;
     }
 
     /**
-     * Genera un informe textual del estado de la llave para el panel de Torneo.
+     * Genera un informe textual del estado de la llave.
+     * @return Resumen con marcadores de Ida, Vuelta y Global, además de penaltis.
      */
     public String getResumen() {
         StringBuilder sb = new StringBuilder();
@@ -132,13 +160,30 @@ public class Eliminatoria {
 
         if (ida != null && ida.isTerminado()) {
             sb.append("\n [IDA] ").append(ida.getGolesLocal()).append(" - ").append(ida.getGolesVisitante());
+            
+            // Si es final a partido único y hubo penaltis
+            if (!doblePartido && (ida.getPenaltisLocal() > 0 || ida.getPenaltisVisitante() > 0)) {
+                sb.append(String.format(" Penaltis: (%d-%d)", ida.getPenaltisLocal(), ida.getPenaltisVisitante()));
+            }
         }
         if (vuelta != null && vuelta.isTerminado()) {
             sb.append("\n [VTA] ").append(vuelta.getGolesLocal()).append(" - ").append(vuelta.getGolesVisitante());
             int gA = ida.getGolesLocal() + vuelta.getGolesVisitante();
             int gB = ida.getGolesVisitante() + vuelta.getGolesLocal();
             sb.append(" (Global: ").append(gA).append("-").append(gB).append(")");
+            
+            // Penaltis en el global (se chutan en la vuelta)
+            if (vuelta.getPenaltisLocal() > 0 || vuelta.getPenaltisVisitante() > 0) {
+                 // vuelta.local es equipoB, vuelta.visitante es equipoA
+                 // Así que el score de penaltis de A es penaltisVisitante, y de B es penaltisLocal
+                 sb.append(String.format(" Penaltis: (%d-%d)", vuelta.getPenaltisVisitante(), vuelta.getPenaltisLocal()));
+            }
         }
+        
+        if (ganador != null) {
+            sb.append("\n ✓ CLASIFICADO: ").append(ganador.getNombre()).append("\n");
+        }
+        
         return sb.toString();
     }
 
@@ -148,18 +193,24 @@ public class Eliminatoria {
     public Partido getIda()          { return ida; }
     public Partido getVuelta()       { return vuelta; }
     public Equipo  getGanador()      { return ganador; }
+    public void    setGanador(Equipo g) { this.ganador = g; }
     public boolean isDoblePartido()  { return doblePartido; }
-    
+
+    /** @return true si la eliminatoria ya tiene un resultado definitivo. */
     public boolean isCompleta() {
+        if (ganador != null) return true;
         if (!doblePartido) return ida != null && ida.isTerminado();
-        return (vuelta != null && vuelta.isTerminado()) || (ganador != null);
+        return vuelta != null && vuelta.isTerminado();
     }
 
     /**
      * Verifica si un equipo participa en esta llave.
+     * @param e Equipo a buscar.
+     * @return true si el equipo es A o B de esta eliminatoria.
      */
     public boolean esMiPartido(Equipo e) {
         if (e == null) return false;
-        return equipoA.getNombre().equals(e.getNombre()) || equipoB.getNombre().equals(e.getNombre());
+        return equipoA.getNombre().equals(e.getNombre())
+            || equipoB.getNombre().equals(e.getNombre());
     }
 }

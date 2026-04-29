@@ -89,15 +89,26 @@ public class PanelPartido extends JPanel {
         JPanel hudMarcador = construirHUDMarcador();
 
         // 2. Centro: Feed de Comentarios y Narración
-        txtNarracion = new JTextArea();
-        txtNarracion.setFont(fontMono(12));
-        txtNarracion.setBackground(new Color(5, 10, 25));
-        txtNarracion.setForeground(new Color(180, 210, 255));
+        txtNarracion = new JTextArea() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.setColor(new Color(0, 0, 0, 160));
+                g.fillRect(0, 0, getWidth(), getHeight());
+                super.paintComponent(g);
+            }
+        };
+        txtNarracion.setOpaque(false);
+        txtNarracion.setFont(fontMono(13));
+        txtNarracion.setLineWrap(true);
+        txtNarracion.setWrapStyleWord(true);
+        txtNarracion.setForeground(new Color(200, 230, 255));
         txtNarracion.setEditable(false);
         txtNarracion.setText(partido.getNarracion());
 
         JScrollPane scrollNarracion = new JScrollPane(txtNarracion);
-        scrollNarracion.setBorder(null);
+        scrollNarracion.setOpaque(false);
+        scrollNarracion.getViewport().setOpaque(false);
+        styleScrollBar(scrollNarracion);
 
         JPanel wrapNarracion = glassPanel(new BorderLayout(0, 5));
         wrapNarracion.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
@@ -170,13 +181,30 @@ public class PanelPartido extends JPanel {
         equipoUsuario.recuperarEnergiaPlantilla(); 
         eliminatoria.determinarGanador();
 
+        // Caso 1: Doble partido y solo hemos jugado la ida
+        if (eliminatoria.isDoblePartido() && eliminatoria.getVuelta() == null) {
+            btnVolver.setVisible(true);
+            txtNarracion.append("\n\u2705 IDA COMPLETADA. Vuelve al cuadro para jugar la vuelta.\n");
+            JOptionPane.showMessageDialog(this, "Fin del partido de Ida.\nResultado: " + marcadorTexto(), "Resultados Ida", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        // Caso 2: Empate global requiere tanda de penaltis
         if (eliminatoria.requierePenaltis()) {
             btnPenaltis.setVisible(true);
-            txtNarracion.append("\n⚠️ EMPATE GLOBAL: TANDA DE PENALTIS 🥅\n");
+            txtNarracion.append("\n\u26A0\uFE0F EMPATE GLOBAL: TANDA DE PENALTIS \uD83E\uDD45\n");
+            JOptionPane.showMessageDialog(this, "El global está empatado.\nNos vamos a la tanda de penaltis.", "Empate Global", JOptionPane.WARNING_MESSAGE);
         } else {
+            // Caso 3: Hay ganador claro
             btnVolver.setVisible(true);
-            String outcome = (eliminatoria.getGanador() == equipoUsuario) ? "CLASIFICADO" : "ELIMINADO";
-            txtNarracion.append("\n🏁 FIN DE LA ELIMINATORIA: " + outcome + "\n");
+            String outcome = (eliminatoria.getGanador() != null && 
+                              eliminatoria.getGanador().getNombre().equals(equipoUsuario.getNombre())) 
+                             ? "CLASIFICADO" : "ELIMINADO";
+            txtNarracion.append("\n\uD83C\uDFC1 FIN DE LA ELIMINATORIA: " + outcome + "\n");
+            
+            JOptionPane.showMessageDialog(this, 
+                "Fin del partido.\nResultado: " + marcadorTexto() + "\n\nEstado en Torneo: " + outcome, 
+                "Resultados", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -186,16 +214,16 @@ public class PanelPartido extends JPanel {
 
     private JPanel construirHUDMarcador() {
         JPanel p = new JPanel(new BorderLayout());
-        p.setPreferredSize(new Dimension(0, 65));
-        p.setBackground(new Color(2, 6, 20));
-        p.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, UCL_BLUE));
+        p.setPreferredSize(new Dimension(0, 85));
+        p.setBackground(new Color(1, 10, 30));
+        p.setBorder(BorderFactory.createMatteBorder(0, 0, 3, 0, UCL_BLUE));
 
         lblMarcador = new JLabel(marcadorTexto(), SwingConstants.CENTER);
-        lblMarcador.setFont(fontTitle(24));
+        lblMarcador.setFont(fontTitle(32));
         lblMarcador.setForeground(Color.WHITE);
 
-        lblMinuto = glowLabel("⌚ MIN 0'", UCL_BLUE_LT, 14, true);
-        lblMinuto.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 25));
+        lblMinuto = glowLabel("⌚ MIN 0'", UCL_BLUE_LT, 18, true);
+        lblMinuto.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 40));
 
         p.add(lblMarcador, BorderLayout.CENTER);
         p.add(lblMinuto, BorderLayout.EAST);
@@ -224,16 +252,21 @@ public class PanelPartido extends JPanel {
 
         // Sub-bloque: Monitor de Estamina
         txtOnce = new JTextArea();
-        txtOnce.setFont(fontMono(10));
+        txtOnce.setOpaque(false);
+        txtOnce.setFont(fontMono(11));
         txtOnce.setEditable(false);
-        txtOnce.setBackground(new Color(0,0,0,80));
         txtOnce.setForeground(Color.WHITE);
         
+        JScrollPane scrollOnce = new JScrollPane(txtOnce);
+        scrollOnce.setOpaque(false);
+        scrollOnce.getViewport().setOpaque(false);
+        styleScrollBar(scrollOnce);
+
         JPanel pnlOnce = glassPanel(new BorderLayout());
         pnlOnce.add(glowLabel("📋 RENDIMIENTO EN VIVO", UCL_BLUE_LT, 10, true), BorderLayout.NORTH);
-        pnlOnce.add(new JScrollPane(txtOnce), BorderLayout.CENTER);
+        pnlOnce.add(scrollOnce, BorderLayout.CENTER);
 
-        side.add(pnlCambios); side.add(Box.createVerticalStrut(10));
+        side.add(pnlCambios); side.add(Box.createVerticalStrut(15));
         side.add(pnlOnce);
 
         actualizarSidebar();
@@ -297,8 +330,23 @@ public class PanelPartido extends JPanel {
             partido.getGolesVisitante(), partido.getPenaltisVisitante()));
         
         if (!partido.isEnTanda()) {
+            // Asignar el ganador de penaltis a la eliminatoria
+            Equipo ganadorPenaltis = partido.getGanador();
+            if (ganadorPenaltis != null) {
+                eliminatoria.setGanador(ganadorPenaltis);
+            }
+            
             btnPenaltis.setEnabled(false);
             btnVolver.setVisible(true);
+            
+            String outcome = (ganadorPenaltis != null && 
+                              ganadorPenaltis.getNombre().equals(equipoUsuario.getNombre())) 
+                             ? "CLASIFICADO" : "ELIMINADO";
+            txtNarracion.append("\n\uD83C\uDFC6 RESULTADO PENALTIS: " + outcome + "\n");
+            
+            JOptionPane.showMessageDialog(this, 
+                "Fin de la tanda de penaltis.\nResultado: " + lblMarcador.getText() + "\n\nEstado en Torneo: " + outcome, 
+                "Resultados Penaltis", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -309,9 +357,10 @@ public class PanelPartido extends JPanel {
     }
 
     @Override protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setPaint(new GradientPaint(0, 0, DEEP_BLUE, 0, getHeight(), ROYAL_BLUE));
         g2.fillRect(0, 0, getWidth(), getHeight());
-        g2.dispose(); super.paintComponent(g);
+        g2.dispose();
     }
 }

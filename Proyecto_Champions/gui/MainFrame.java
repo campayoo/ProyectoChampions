@@ -2,6 +2,7 @@ package gui;
 
 import model.*;
 import data.LectorDatos;
+import data.GestorFicheros;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
@@ -14,7 +15,8 @@ import java.util.ArrayList;
  * Responsabilidades:
  * - Gestionar la navegación entre pantallas (Bienvenida, Torneo, Partido, Mercado, Alineación).
  * - Centralizar el estado global del Torneo y el Mercado.
- * - Proporcionar un HUD (Heads-Up Display) inferior con información económica y cronológica del club.
+ * - Proveer la capacidad de guardar/cargar la partida en cualquier momento.
+ * - Proporcionar un HUD inferior con información económica del club.
  */
 public class MainFrame extends JFrame {
 
@@ -31,7 +33,6 @@ public class MainFrame extends JFrame {
     private Eliminatoria       eliminatoriaActual;
 
     // --- BLOQUE: COMPONENTES DE PRESENTACIÓN ---
-    private final CardLayout cardLayout; // Motor de cambio de pantallas
     private final JPanel     contenedor; // Lienzo donde se apilan los paneles
     
     // HUD inferior (Barra de estado)
@@ -39,13 +40,9 @@ public class MainFrame extends JFrame {
     private final JLabel lblPresupuesto;
     private final JLabel lblRonda;
 
-    /**
-     * Constructor: Configura la arquitectura del marco principal.
-     */
     public MainFrame() throws IOException {
         super("⚽ UCL MANAGER PRO: Edición Elite");
         
-        // Configuración de ventana (Resolución progresiva)
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1200, 800);
         setExtendedState(JFrame.MAXIMIZED_BOTH); 
@@ -53,71 +50,102 @@ public class MainFrame extends JFrame {
         setLocationRelativeTo(null);
         setBackground(new Color(0, 5, 20));
 
-        // Iniciamos el orquestador de vistas
-        cardLayout = new CardLayout();
-        contenedor = new JPanel(cardLayout);
-        contenedor.setOpaque(false);
+        // Orquestador Simplificado: Ahora OPACO para evitar fugas visuales (ghosting)
+        contenedor = new JPanel(new BorderLayout());
+        contenedor.setOpaque(true);
+        contenedor.setBackground(new Color(0, 5, 20)); // Fondo base sólido Champions
 
-        // SUB-BLOQUE: Construcción del HUD Financiero y Deportivo
         JPanel barraEstado = new JPanel(new BorderLayout(15, 0));
-        barraEstado.setBackground(new Color(2, 8, 28));
-        barraEstado.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(0, 100, 255)));
+        barraEstado.setBackground(new Color(1, 8, 25));
+        barraEstado.setBorder(BorderFactory.createMatteBorder(2, 0, 0, 0, UCLTheme.UCL_BLUE));
 
         lblEstado      = new JLabel("🟢 SISTEMAS ONLINE");
         lblPresupuesto = new JLabel("---");
         lblRonda       = new JLabel("---");
         
         for (JLabel l : new JLabel[] { lblEstado, lblPresupuesto, lblRonda }) {
-            l.setForeground(new Color(180, 210, 255));
-            l.setFont(new Font("Segoe UI", Font.BOLD, 12));
-            l.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+            l.setForeground(UCLTheme.UCL_SILVER);
+            l.setFont(UCLTheme.fontTitle(13));
+            l.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
         }
         
         barraEstado.add(lblEstado, BorderLayout.WEST);
         barraEstado.add(lblRonda, BorderLayout.CENTER);
         barraEstado.add(lblPresupuesto, BorderLayout.EAST);
 
-        // Montaje final en el JFrame
         setLayout(new BorderLayout());
         add(contenedor, BorderLayout.CENTER);
         add(barraEstado, BorderLayout.SOUTH);
 
-        // Pantalla de arranque: Bienvenida
         mostrarPantalla(PANTALLA_BIENVENIDA);
     }
 
+    public void mostrarPantalla(String nombre) throws IOException {
+        contenedor.removeAll(); 
+        
+        JPanel nuevaPantalla = null;
+        switch (nombre) {
+            case PANTALLA_BIENVENIDA:
+                nuevaPantalla = new PanelBienvenida(this);
+                break;
+            case PANTALLA_TORNEO:
+                nuevaPantalla = new PanelTorneo(this);
+                actualizarBarra();
+                break;
+            case PANTALLA_PARTIDO:
+                nuevaPantalla = new PanelPartido(this, eliminatoriaActual);
+                break;
+            case PANTALLA_MERCADO:
+                nuevaPantalla = new PanelMercado(this, mercado);
+                break;
+            case PANTALLA_ALINEACION:
+                nuevaPantalla = new PanelAlineacion(this, torneo.getEquipoUsuario());
+                break;
+        }
+        
+        if (nuevaPantalla != null) {
+            contenedor.add(nuevaPantalla, BorderLayout.CENTER);
+        }
+        
+        contenedor.revalidate();
+        contenedor.repaint();
+        this.validate(); 
+        this.repaint();
+    }
+
     // ---------------------------------------------------------------------
-    // BLOQUE: MOTOR DE NAVEGACIÓN (CARD SWITCHER)
+    // BLOQUE: PERSISTENCIA Y CARGA
     // ---------------------------------------------------------------------
 
     /**
-     * Cambia dinámicamente la pantalla actual reconstruyendo los componentes si es necesario.
+     * Guarda el progreso actual en un fichero binario.
      */
-    public void mostrarPantalla(String nombre) throws IOException {
-        switch (nombre) {
-            case PANTALLA_BIENVENIDA -> {
-                contenedor.add(new PanelBienvenida(this), PANTALLA_BIENVENIDA);
-                cardLayout.show(contenedor, PANTALLA_BIENVENIDA);
-            }
-            case PANTALLA_TORNEO -> {
-                contenedor.add(new PanelTorneo(this), PANTALLA_TORNEO);
-                cardLayout.show(contenedor, PANTALLA_TORNEO);
-                actualizarBarra();
-            }
-            case PANTALLA_PARTIDO -> {
-                contenedor.add(new PanelPartido(this, eliminatoriaActual), PANTALLA_PARTIDO);
-                cardLayout.show(contenedor, PANTALLA_PARTIDO);
-            }
-            case PANTALLA_MERCADO -> {
-                contenedor.add(new PanelMercado(this, mercado), PANTALLA_MERCADO);
-                cardLayout.show(contenedor, PANTALLA_MERCADO);
-            }
-            case PANTALLA_ALINEACION -> {
-                contenedor.add(new PanelAlineacion(this, torneo.getEquipoUsuario()), PANTALLA_ALINEACION);
-                cardLayout.show(contenedor, PANTALLA_ALINEACION);
-            }
+    public void guardarPartida() {
+        if (torneo != null && mercado != null) {
+            String resultado = GestorFicheros.guardarPartidaBinaria(torneo, mercado);
+            setEstado("PARTIDA GUARDADA");
+            JOptionPane.showMessageDialog(this, resultado, "Guardar Partida", JOptionPane.INFORMATION_MESSAGE);
         }
-        revalidate(); repaint();
+    }
+
+    /**
+     * Carga el progreso desde el fichero binario.
+     */
+    public void cargarPartida() {
+        Object[] datos = GestorFicheros.cargarPartidaBinaria();
+        if (datos != null && datos.length == 2) {
+            torneo = (Torneo) datos[0];
+            mercado = (MercadoFichajes) datos[1];
+            setEstado("PARTIDA CARGADA");
+            try {
+                mostrarPantalla(PANTALLA_TORNEO);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontró ninguna partida o el archivo está corrupto.", 
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     // ---------------------------------------------------------------------
@@ -125,14 +153,13 @@ public class MainFrame extends JFrame {
     // ---------------------------------------------------------------------
 
     /**
-     * Inicializa la base de datos y genera el cuadro de competición.
+     * Inicializa la base de datos y genera el cuadro de competición desde cero.
      */
     public void iniciarTorneo(Equipo seleccionUsuario) throws IOException {
         torneo = new Torneo("UEFA CHAMPIONS LEAGUE");
         ArrayList<Equipo> equiposDB = LectorDatos.cargarEquipos();
         for (Equipo e : equiposDB) torneo.agregarEquipo(e);
 
-        // Sincronización del equipo del usuario
         for (Equipo e : torneo.getEquipos()) {
             if (e.getNombre().equalsIgnoreCase(seleccionUsuario.getNombre())) {
                 e.setUsuario(true);
@@ -142,37 +169,76 @@ public class MainFrame extends JFrame {
         }
 
         mercado = new MercadoFichajes(torneo);
+        
+        // BLOQUE: Sembrado inicial del mercado (Scouting Activo)
+        for (Equipo e : torneo.getEquipos()) {
+            if (e != torneo.getEquipoUsuario()) {
+                ArrayList<Jugador> p = e.getPlantilla();
+                // Sembrado de calidad: Ponemos a los 3 mejores disponibles
+                p.sort((j1, j2) -> Integer.compare(j2.getMediaGeneral(), j1.getMediaGeneral()));
+                if (p.size() >= 3) {
+                    mercado.publicarJugador(p.get(0));
+                    mercado.publicarJugador(p.get(1));
+                    mercado.publicarJugador(p.get(2));
+                }
+            }
+        }
+
         torneo.generarCruces();
         mostrarPantalla(PANTALLA_TORNEO);
     }
 
     /**
-     * Simula los encuentros de aquellos equipos controlados por la CPU.
+     * Simula los encuentros pendientes (incluyendo los del usuario si decide saltarlos).
+     * @return Resumen en texto de los partidos de la ronda.
      */
-    public void simularRondaIA() throws IOException {
+    public String simularRondaIA() throws IOException {
         ArrayList<Equipo> clasificados = new ArrayList<>();
+        StringBuilder resultados = new StringBuilder("🏆 RESULTADOS DE LA RONDA:\n\n");
 
         for (Eliminatoria elim : torneo.getEliminatorias()) {
-            Equipo usr = torneo.getEquipoUsuario();
-            boolean esPartidoUsuario = elim.getEquipoA() == usr || elim.getEquipoB() == usr;
-
-            // Procesamos automáticamente partidos que no involucren al mánager humano
-            if (!esPartidoUsuario) {
+            // Si el partido no está completo, lo completamos auto (incluso el del usuario)
+            if (!elim.isCompleta()) {
                 elim.jugarIdaAuto();
                 if (elim.isDoblePartido()) elim.jugarVueltaAuto();
                 else elim.determinarGanador();
                 
                 if (elim.getGanador() == null) elim.resolverEmpateIA();
-                if (elim.getGanador() != null) clasificados.add(elim.getGanador());
-            } else {
-                // Si el usuario ya jugó y ganó, se añade a la lista de clasificados
-                if (elim.getGanador() != null) clasificados.add(elim.getGanador());
             }
+            
+            // Añadimos el clasificado
+            if (elim.getGanador() != null) clasificados.add(elim.getGanador());
+            
+            // Adjuntamos el registro de este enfrentamiento al reporte
+            resultados.append(elim.getResumen()).append("\n");
         }
 
         torneo.refrescarGoleadores();
         torneo.avanzarRonda(clasificados);
         mostrarPantalla(PANTALLA_TORNEO);
+        
+        // Comprobar si hay un campeón definitivo
+        Equipo campeon = torneo.getGanadorTorneo();
+        if (campeon != null) {
+            mostrarCelebracionCampeon(campeon);
+        }
+        
+        return resultados.toString();
+    }
+    
+    private void mostrarCelebracionCampeon(Equipo campeon) {
+        String msg = "¡ENHORABUENA AL " + campeon.getNombre().toUpperCase() + "!\n\n"
+                   + "Se han coronado como los absolutos Campeones de Europa.\n"
+                   + "La gloria eterna ya es suya.";
+                   
+        // Si fue el usuario, felicitación especial
+        if (campeon == torneo.getEquipoUsuario()) {
+            msg = "🏆 ¡ERES EL REY DE EUROPA! 🏆\n\n"
+                + "Has llevado al " + campeon.getNombre() + " a la gloria continental.\n"
+                + "¡Eres el mejor mánager del mundo!";
+        }
+        
+        JOptionPane.showMessageDialog(this, msg, "⚽ ¡GRAN GANADOR DE LA CHAMPIONS! ⚽", JOptionPane.WARNING_MESSAGE);
     }
 
     // ---------------------------------------------------------------------
