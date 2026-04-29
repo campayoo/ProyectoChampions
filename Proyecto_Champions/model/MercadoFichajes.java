@@ -1,32 +1,40 @@
 package model;
 
 import interfaces.Transferible;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
 /**
- * Clase MercadoFichajes: El 'Broker' de la Competición.
- * 
- * Centraliza la oferta y demanda de atletas profesionales. 
- * Gestión Técnica:
+ * Clase MercadoFichajes: El 'Broker' de la competición.
+ *
+ * Centraliza la oferta y demanda de atletas profesionales.
  * - Mantiene un repositorio global de jugadores en 'Transfer List'.
  * - Valida transacciones financieras según el presupuesto de los clubes.
- * - Garantiza la integridad de los datos mediante el uso de IDs únicos.
+ * - Garantiza la integridad de datos mediante IDs únicos con {@link HashSet}.
+ *
+ * Implementa {@link Serializable} para persistencia con ObjectOutputStream.
  */
-public class MercadoFichajes {
+public class MercadoFichajes implements Serializable {
 
-    // --- BLOQUE: INFRAESTRUCTURA DE DATOS ---
-    private final HashSet<Integer>   mercadoIds;   // Búsqueda rápida O(1) de disponibilidad
-    private final ArrayList<Jugador> ofertados;    // Representación secuencial para la interfaz
-    private final Torneo             torneo;       // Ámbito de aplicación del mercado
+    /** Versión de serialización para compatibilidad de ficheros. */
+    private static final long serialVersionUID = 8L;
+
+    /** Conjunto de IDs para búsqueda rápida O(1) de disponibilidad. */
+    private final HashSet<Integer>   mercadoIds;
+    /** Lista secuencial de jugadores ofertados para la interfaz gráfica. */
+    private final ArrayList<Jugador> ofertados;
+    /** Referencia al torneo (ámbito de aplicación del mercado). */
+    private final Torneo             torneo;
 
     /**
-     * Constructor: Inicializa las cámaras de compensación de fichajes.
+     * Constructor: Inicializa las estructuras del mercado de fichajes.
+     * @param torneo Torneo al que pertenece este mercado.
      */
     public MercadoFichajes(Torneo torneo) {
         this.torneo     = torneo;
-        this.mercadoIds = new HashSet<>(); 
+        this.mercadoIds = new HashSet<>();
         this.ofertados  = new ArrayList<>();
     }
 
@@ -36,8 +44,10 @@ public class MercadoFichajes {
 
     /**
      * Pone a la venta un activo del club en el mercado global.
-     * @param persona El objeto a transferir.
-     * @return Log descriptivo de la operación.
+     * Valida que el objeto sea un {@link Jugador} y que implemente {@link Transferible}.
+     *
+     * @param persona Persona a transferir (debe ser un Jugador).
+     * @return Mensaje descriptivo del resultado de la operación.
      */
     public String publicarJugador(Persona persona) {
         // Validación de polimorfismo
@@ -52,28 +62,33 @@ public class MercadoFichajes {
             return "❌ Acción denegada: Jugador intransferible según contrato.";
         }
 
-        // Control de duplicados en la bolsa
+        // Control de duplicados en la bolsa usando HashSet
         if (!mercadoIds.add(jugador.getId())) {
             return "⚠️ El jugador ya forma parte del mercado de activos.";
         }
 
         jugador.setDisponible(true);
         ofertados.add(jugador);
-        return "✅ Registrado correctamente: " + jugador.getNombre() + " (Tasación: " + String.format("%.1f", jugador.getValorMercado()) + "M€).";
+        return "✅ Registrado correctamente: " + jugador.getNombre()
+             + " (Tasación: " + String.format("%.1f", jugador.getValorMercado()) + "M€).";
     }
 
     /**
-     * Retira la oferta de un jugador para que deje de ser visible en el mercado.
+     * Retira la oferta de un jugador del mercado.
+     * Usa {@link Iterator} para eliminación segura sin ConcurrentModificationException.
+     *
+     * @param jugador Jugador a retirar del mercado.
+     * @return Mensaje descriptivo del resultado.
      */
     public String retirarDelMercado(Jugador jugador) {
         if (!mercadoIds.contains(jugador.getId())) {
             return "⚠️ Registro no encontrado: El jugador no está en venta.";
         }
-        
+
         mercadoIds.remove(jugador.getId());
         jugador.setDisponible(false);
 
-        // Eliminación segura mediante iterador para evitar concurrencia en la lista
+        // Eliminación segura mediante iterador
         Iterator<Jugador> it = ofertados.iterator();
         while (it.hasNext()) {
             if (it.next().getId() == jugador.getId()) {
@@ -90,25 +105,30 @@ public class MercadoFichajes {
 
     /**
      * Ejecuta una compra-venta entre clubes.
-     * Deduce fondos, transfiere la ficha y actualiza el balance de ambos clubes.
+     * Deduce fondos del comprador, abona al vendedor (95% del precio)
+     * y transfiere la ficha del jugador.
+     *
+     * @param persona Jugador a transferir.
+     * @param destino Club comprador.
+     * @return Mensaje descriptivo del resultado de la transacción.
      */
     public String transferir(Persona persona, Equipo destino) {
         if (!(persona instanceof Jugador)) return "❌ Objeto de tipo erróneo.";
-        
+
         Jugador jugador = (Jugador) persona;
 
         if (!mercadoIds.contains(jugador.getId())) {
             return "❌ Transacción fallida: El jugador no está disponible legalmente.";
         }
 
-        // Bloque: Chequeo de caja y liquidez
+        // Chequeo de liquidez financiera del club comprador
         double precio = jugador.getValorMercado();
         if (destino.getPresupuesto() < precio) {
-            return String.format("❌ Liquidez insuficiente. El club necesita %.1f M€ adicionales.", 
+            return String.format("❌ Liquidez insuficiente. El club necesita %.1f M€ adicionales.",
                                  precio - destino.getPresupuesto());
         }
 
-        // Bloque: Protocolo de Traspaso (Salida)
+        // Protocolo de Traspaso: salida del club vendedor
         Equipo origen = jugador.getEquipo();
         if (origen != null) {
             origen.removerJugador(jugador);
@@ -116,7 +136,7 @@ public class MercadoFichajes {
             origen.setPresupuesto(origen.getPresupuesto() + (precio * 0.95));
         }
 
-        // Bloque: Protocolo de Traspaso (Entrada)
+        // Protocolo de Traspaso: entrada al club comprador
         destino.agregarJugador(jugador);
         destino.setPresupuesto(destino.getPresupuesto() - precio);
 
@@ -124,12 +144,13 @@ public class MercadoFichajes {
         torneo.registrarNuevoId(jugador.getId());
         retirarDelMercado(jugador);
 
-        return String.format("🤝 OPERACIÓN EXITOSA: %s firma por el %s.", 
+        return String.format("🤝 OPERACIÓN EXITOSA: %s firma por el %s.",
                               jugador.getNombre(), destino.getNombre());
     }
 
     /**
-     * Proceso automático: Publica toda la plantilla de un equipo disuelto en subasta.
+     * Proceso automático: publica toda la plantilla de un equipo eliminado.
+     * @param equipo Equipo cuya plantilla se pone en subasta.
      */
     public void publicarPlantillaEliminada(Equipo equipo) {
         Iterator<Jugador> it = equipo.getPlantilla().iterator();
@@ -138,18 +159,30 @@ public class MercadoFichajes {
         }
     }
 
-    // --- Consultas de Estado de Bolsa ---
+    // --- BLOQUE: CONSULTAS DE ESTADO ---
+
+    /** @return Lista de jugadores actualmente ofertados en el mercado. */
     public ArrayList<Jugador> getOfertados()    { return ofertados; }
+
+    /** @return true si el jugador con ese ID está en el mercado. */
     public boolean estaEnMercado(int id)         { return mercadoIds.contains(id); }
 
     /**
-     * Filtra el catálogo de jugadores según su rol táctico (POR, DEF, MED, DEL).
+     * Filtra el catálogo por rol táctico (POR, DEF, MED, DEL).
+     *
+     * @param posicion Filtro de posición ("TODOS" para ver todos).
+     * @return Lista de jugadores que coinciden con el filtro.
      */
     public ArrayList<Jugador> filtrarPorPosicion(String posicion) {
         ArrayList<Jugador> resultado = new ArrayList<>();
         for (Jugador j : ofertados) {
-            if (posicion == null || posicion.equals("TODOS") || j.getPosicion().equalsIgnoreCase(posicion)) {
+            if (posicion == null || posicion.equals("TODOS")) {
                 resultado.add(j);
+            } else {
+                String catJugador = Jugador.categoriaGeneral(j.getPosicion());
+                if (catJugador.equals(posicion)) {
+                    resultado.add(j);
+                }
             }
         }
         return resultado;

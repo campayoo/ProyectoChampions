@@ -85,22 +85,21 @@ public class PanelMercado extends JPanel {
         modeloLista       = new DefaultListModel<>();
         jugadoresVisibles = new ArrayList<>();
         listaJugadores    = new JList<>(modeloLista);
-        listaJugadores.setBackground(new Color(10, 20, 45));
-        listaJugadores.setForeground(Color.WHITE);
-        listaJugadores.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        listaJugadores.setFixedCellHeight(35);
+        styleList(listaJugadores);
+        listaJugadores.setFixedCellHeight(40);
         listaJugadores.addListSelectionListener(e -> { if (!e.getValueIsAdjusting()) mostrarDetalle(); });
 
         JScrollPane scrollLista = new JScrollPane(listaJugadores);
-        scrollLista.setBorder(BorderFactory.createLineBorder(UCL_BLUE, 1));
+        styleScrollBar(scrollLista);
+        scrollLista.setBorder(BorderFactory.createLineBorder(new Color(255,255,255,20), 1));
 
         // Sub-bloque: Informe de Scouting (Panel Lateral)
         txtDetalle = new JTextArea();
-        txtDetalle.setFont(fontMono(12));
+        txtDetalle.setFont(fontMono(14));
         txtDetalle.setEditable(false);
-        txtDetalle.setBackground(new Color(6, 12, 30));
-        txtDetalle.setForeground(GRIS_CLARO);
-        txtDetalle.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        txtDetalle.setOpaque(false);
+        txtDetalle.setForeground(UCL_SILVER);
+        txtDetalle.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JPanel wrapDetalle = glassPanel(new BorderLayout());
         wrapDetalle.setPreferredSize(new Dimension(320, 0));
@@ -110,9 +109,9 @@ public class PanelMercado extends JPanel {
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 10));
         panelBotones.setOpaque(false);
 
-        JButton btnFichar = uclButton("✅ CERRAR FICHAJE", VERDE);
-        JButton btnVender = uclButton("💰 PONER EN VENTA", UCL_GOLD);
-        JButton btnVolver = uclButton("↩ VOLVER AL CLUB", UCL_BLUE);
+        JButton btnFichar = uclButton("CERRAR FICHAJE", VERDE);
+        JButton btnVender = uclButton("VENDER JUGADOR AL MERCADO", UCL_GOLD);
+        JButton btnVolver = uclButton("VOLVER AL CLUB", UCL_BLUE);
 
         btnFichar.addActionListener(e -> ficharSeleccionado());
         btnVender.addActionListener(e -> venderJugador());
@@ -125,8 +124,8 @@ public class PanelMercado extends JPanel {
         panelBotones.add(btnVolver);
 
         // Integración Final
-        JPanel centro = new JPanel(new BorderLayout(15, 0));
-        centro.setOpaque(false);
+        JPanel centro = glassPanel(new BorderLayout(15, 0));
+        centro.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         centro.add(scrollLista, BorderLayout.CENTER);
         centro.add(wrapDetalle, BorderLayout.EAST);
 
@@ -209,11 +208,13 @@ public class PanelMercado extends JPanel {
             String msg = mercado.transferir(j, usr);
             JOptionPane.showMessageDialog(this, msg);
             actualizarTabla();
+            frame.actualizarBarra(); // Actualización inmediata del HUD
         }
     }
 
     /**
-     * Habilita un jugador de la propia plantilla para ser transferido.
+     * Habilita un jugador de la propia plantilla para ser transferido y lo vende directamente
+     * a un equipo IA o agente libre recuperando parte del presupuesto.
      */
     private void venderJugador() {
         Equipo eq = frame.getTorneo().getEquipoUsuario();
@@ -231,8 +232,8 @@ public class PanelMercado extends JPanel {
         }
 
         String elegido = (String) JOptionPane.showInputDialog(
-            this, "Selecciona el activo a transferir:",
-            "Venta de Jugador", JOptionPane.PLAIN_MESSAGE,
+            this, "Selecciona el activo a transferir (Recuperarás el 95% de su valor):",
+            "Venta Directa de Jugador", JOptionPane.PLAIN_MESSAGE,
             null, nombres, nombres[0]);
 
         if (elegido == null) return;
@@ -242,9 +243,19 @@ public class PanelMercado extends JPanel {
             if (nombres[i].equals(elegido)) { idx = i; break; }
         }
 
-        String resultado = mercado.publicarJugador(plantilla.get(idx));
+        Jugador j = plantilla.get(idx);
+        double recuperado = j.getValorMercado() * 0.95;
+        
+        // Ejecución de la venta y actualización de presupuesto
+        eq.removerJugador(j);
+        eq.setPresupuesto(eq.getPresupuesto() + recuperado);
+        mercado.publicarJugador(j); // Se libera al mercado para que otros puedan ficharlo
+        
+        String resultado = String.format("Venta exitosa. El club recibe %.2f M€ por %s.", recuperado, j.getNombre());
         JOptionPane.showMessageDialog(this, resultado);
+        
         actualizarTabla();
+        frame.actualizarBarra(); // Reflejar en el HUD
     }
 
     private String presupuestoTexto() {
