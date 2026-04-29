@@ -88,6 +88,7 @@ public class Partido implements Simulable, Serializable {
      */
     @Override
     public void simular() {
+        System.out.println("[DEBUG - Partido] Iniciando simulación rápida: " + local.getNombre() + " vs " + visitante.getNombre());
         local.establecerMejorOnce();
         visitante.establecerMejorOnce();
         agregarEncabezado();
@@ -95,6 +96,7 @@ public class Partido implements Simulable, Serializable {
             narracion.append(procesarMinuto(min));
         }
         agregarResultadoFinal();
+        System.out.println("[DEBUG - Partido] Simulación finalizada. Goles Local: " + golesLocal + " | Goles Visitante: " + golesVisitante);
     }
 
     @Override public String  getNarracion() { return narracion.toString(); }
@@ -110,6 +112,7 @@ public class Partido implements Simulable, Serializable {
      * Debe llamarse antes de {@link #simularSiguienteBloque()}.
      */
     public void iniciarSimulacion() {
+        System.out.println("[DEBUG - Partido] Iniciando simulación por bloques: " + local.getNombre() + " vs " + visitante.getNombre());
         local.establecerMejorOnce();
         visitante.establecerMejorOnce();
         agregarEncabezado();
@@ -123,6 +126,8 @@ public class Partido implements Simulable, Serializable {
         if (terminado || minutoActual > DURACION) return "";
         StringBuilder bloque = new StringBuilder();
         int limite = Math.min(minutoActual + 14, DURACION);
+        
+        System.out.println("[DEBUG - Partido] Simulando bloque " + minutoActual + "' a " + limite + "'...");
 
         for (int min = minutoActual; min <= limite; min += 5) {
             String s = procesarMinuto(min);
@@ -131,7 +136,10 @@ public class Partido implements Simulable, Serializable {
         }
 
         minutoActual = limite + 1;
-        if (minutoActual > DURACION) agregarResultadoFinal();
+        if (minutoActual > DURACION) {
+            System.out.println("[DEBUG - Partido] Tiempo reglamentario cumplido. Finalizando partido interactivo.");
+            agregarResultadoFinal();
+        }
         return bloque.toString();
     }
 
@@ -258,6 +266,7 @@ public class Partido implements Simulable, Serializable {
     private String textoGol(Equipo atacante, int min) {
         if (atacante == local) golesLocal++; else golesVisitante++;
         Jugador goleador = elegirGoleador(atacante);
+        System.out.println("[DEBUG - Partido] ¡Gol en el min " + min + "! Anota: " + (goleador != null ? goleador.getNombre() : "En Propia") + " para " + atacante.getNombre());
         if (goleador != null) {
             goleador.addGol();
             return String.format("⚽ [%02d'] ¡GOOOL! %s marca para el %s (%d-%d)\n",
@@ -281,6 +290,7 @@ public class Partido implements Simulable, Serializable {
 
         if (amonestaciones >= 2) {
             expulsados.add(j);
+            System.out.println("[DEBUG - Partido] ¡Expulsión en el min " + min + "! Jugador: " + j.getNombre() + " (" + eq.getNombre() + ")");
             return String.format("🟥 [%02d'] ¡EXPULSIÓN! %s abandona el campo (%s)\n",
                                   min, j.getNombre(), eq.getNombre());
         }
@@ -325,6 +335,7 @@ public class Partido implements Simulable, Serializable {
      */
     public String simularSiguienteRondaPenal() {
         rondaPenal++;
+        System.out.println("[DEBUG - Partido] Simulando ronda penal #" + rondaPenal);
         boolean aciertoLocal = rng.nextDouble() < 0.78;
         boolean aciertoVisit = rng.nextDouble() < 0.78;
 
@@ -339,12 +350,14 @@ public class Partido implements Simulable, Serializable {
         // Solo se decide ganador pasadas las 5 rondas mínimas
         if (rondaPenal >= RONDAS_MINIMAS_PENALTIS && penaltisLocal != penaltisVisitante) {
              ganadorPenaltis = (penaltisLocal > penaltisVisitante) ? local : visitante;
+             System.out.println("[DEBUG - Partido] Fin de penaltis. Gana " + ganadorPenaltis.getNombre());
         }
         // Muerte súbita: si la diferencia es insalvable antes de completar 5 rondas
         else if (rondaPenal < RONDAS_MINIMAS_PENALTIS) {
             int rondasRestantes = RONDAS_MINIMAS_PENALTIS - rondaPenal;
             if (Math.abs(penaltisLocal - penaltisVisitante) > rondasRestantes) {
                 ganadorPenaltis = (penaltisLocal > penaltisVisitante) ? local : visitante;
+                System.out.println("[DEBUG - Partido] Fin de penaltis (Muerte súbita). Gana " + ganadorPenaltis.getNombre());
             }
         }
         return log;

@@ -42,6 +42,7 @@ public class MainFrame extends JFrame {
 
     public MainFrame() throws IOException {
         super("⚽ UCL MANAGER PRO: Edición Elite");
+        System.out.println("[DEBUG - MainFrame] Arrancando aplicación UCL MANAGER PRO...");
         
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1200, 800);
@@ -81,6 +82,7 @@ public class MainFrame extends JFrame {
     }
 
     public void mostrarPantalla(String nombre) throws IOException {
+        System.out.println("[DEBUG - MainFrame] Navegando a pantalla: " + nombre);
         contenedor.removeAll(); 
         
         JPanel nuevaPantalla = null;
@@ -122,7 +124,9 @@ public class MainFrame extends JFrame {
      */
     public void guardarPartida() {
         if (torneo != null && mercado != null) {
+            System.out.println("[DEBUG - MainFrame] Iniciando proceso de GUARDADO binario...");
             String resultado = GestorFicheros.guardarPartidaBinaria(torneo, mercado);
+            System.out.println("[DEBUG - MainFrame] Resultado de guardado: " + resultado);
             setEstado("PARTIDA GUARDADA");
             JOptionPane.showMessageDialog(this, resultado, "Guardar Partida", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -132,10 +136,12 @@ public class MainFrame extends JFrame {
      * Carga el progreso desde el fichero binario.
      */
     public void cargarPartida() {
+        System.out.println("[DEBUG - MainFrame] Iniciando proceso de CARGA binaria...");
         Object[] datos = GestorFicheros.cargarPartidaBinaria();
         if (datos != null && datos.length == 2) {
             torneo = (Torneo) datos[0];
             mercado = (MercadoFichajes) datos[1];
+            System.out.println("[DEBUG - MainFrame] Carga exitosa. Torneo en fase: " + torneo.getNombreRonda());
             setEstado("PARTIDA CARGADA");
             try {
                 mostrarPantalla(PANTALLA_TORNEO);
@@ -143,6 +149,7 @@ public class MainFrame extends JFrame {
                 e.printStackTrace();
             }
         } else {
+            System.err.println("[DEBUG - MainFrame] Error al cargar: Archivo no encontrado o datos corruptos.");
             JOptionPane.showMessageDialog(this, "No se encontró ninguna partida o el archivo está corrupto.", 
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -156,6 +163,7 @@ public class MainFrame extends JFrame {
      * Inicializa la base de datos y genera el cuadro de competición desde cero.
      */
     public void iniciarTorneo(Equipo seleccionUsuario) throws IOException {
+        System.out.println("[DEBUG - MainFrame] Inicializando Torneo desde cero. Seleccionado: " + seleccionUsuario.getNombre());
         torneo = new Torneo("UEFA CHAMPIONS LEAGUE");
         ArrayList<Equipo> equiposDB = LectorDatos.cargarEquipos();
         for (Equipo e : equiposDB) torneo.agregarEquipo(e);
@@ -193,6 +201,8 @@ public class MainFrame extends JFrame {
      * @return Resumen en texto de los partidos de la ronda.
      */
     public String simularRondaIA() throws IOException {
+        System.out.println("\n[DEBUG - MainFrame] ==============================================");
+        System.out.println("[DEBUG - MainFrame] INICIANDO SIMULACIÓN DE FASE: " + torneo.getNombreRonda());
         ArrayList<Equipo> clasificados = new ArrayList<>();
         StringBuilder resultados = new StringBuilder("🏆 RESULTADOS DE LA RONDA:\n\n");
 
@@ -213,6 +223,8 @@ public class MainFrame extends JFrame {
             resultados.append(elim.getResumen()).append("\n");
         }
 
+        System.out.println("[DEBUG - MainFrame] Fase simulada. Clasificados: " + clasificados.size());
+        
         torneo.refrescarGoleadores();
         torneo.avanzarRonda(clasificados);
         mostrarPantalla(PANTALLA_TORNEO);
@@ -220,9 +232,11 @@ public class MainFrame extends JFrame {
         // Comprobar si hay un campeón definitivo
         Equipo campeon = torneo.getGanadorTorneo();
         if (campeon != null) {
+            System.out.println("[DEBUG - MainFrame] Torneo Finalizado. Campeón detectado: " + campeon.getNombre());
             mostrarCelebracionCampeon(campeon);
         }
         
+        System.out.println("[DEBUG - MainFrame] ==============================================\n");
         return resultados.toString();
     }
     
