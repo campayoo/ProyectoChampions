@@ -1,19 +1,11 @@
-<div align="center">
-
 # ⚽ Proyecto Champions
 
 ### Simulador avanzado de torneos de fútbol en Java
 
-<br/>
-
-> Aplicación Java que simula un entorno completo de fútbol profesional.
+> Aplicación Java que simula un entorno completo de fútbol profesional.  
 > Gestión de equipos, jugadores, fichajes y torneos eliminatorios bajo una arquitectura sólida.
 
-<br/>
-
 [📖 Descripción](#-descripción) · [⚙️ Funcionalidades](#️-funcionalidades) · [🏗️ Arquitectura](#️-arquitectura) · [🚀 Instalación](#-instalación) · [🧪 Tests](#-tests)
-
-</div>
 
 ---
 
@@ -146,17 +138,16 @@ public interface Transferible {
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/tu-usuario/proyecto-champions.git
+git clone https://github.com/campayoo/ProyectoChampions.git
 
 # 2. Entrar al directorio
-cd proyecto-champions
+cd ProyectoChampions
 
 # 3. Ejecutar la aplicación
 java Main.java
 ```
 
-> [!NOTE]
-> El archivo `data/equipos.csv` inicializa los equipos automáticamente al arrancar.
+> **Nota:** El archivo `data/equipos.csv` inicializa los equipos automáticamente al arrancar.
 
 ---
 
@@ -190,12 +181,12 @@ void testSimulacionPartido() {
 
 ## 💡 Mejoras futuras
 
-- [ ] 🗄️ Base de datos relacional (MySQL)
-- [ ] 🌐 API REST con Spring Boot
-- [ ] 🤖 IA para decisiones de juego
-- [ ] 🎮 Modo carrera
-- [ ] 👥 Multijugador (multiplayer)
-- [ ] 🖼️ Migración de GUI a JavaFX
+- 🗄️ Base de datos relacional (MySQL)
+- 🌐 API REST con Spring Boot
+- 🤖 IA para decisiones de juego
+- 🎮 Modo carrera
+- 👥 Multijugador (multiplayer)
+- 🖼️ Migración de GUI a JavaFX
 
 ---
 
@@ -231,10 +222,6 @@ Uso educativo. Libre para modificar y distribuir.
 
 ---
 
-<div align="center">
-
 ### ✔️ Arquitectura limpia · ✔️ Simulación realista · ✔️ Interfaz gráfica · ✔️ Buenas prácticas
 
 *Hecho con ☕ Java y pasión por el fútbol*
-
-</div>
